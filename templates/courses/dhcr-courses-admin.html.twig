@@ -1,0 +1,16 @@
+<div class="dhcr-courses-admin">
+  <h2 class="dhcr-courses-admin__heading">{{ 'Administrate Courses'|t }}</h2>
+  <p class="dhcr-courses-admin__hint">{{ 'Hint: Adding an external resource can be done when editing a course.'|t }}</p>
+
+  <div class="dhcr-courses-admin__grid">
+    {% for card in cards %}
+      <a class="dhcr-courses-card" href="{{ card.url }}">
+        <div class="dhcr-courses-card__icon" aria-hidden="true"><i class="{{ card.icon }}"></i></div>
+        <div class="dhcr-courses-card__title">{{ card.title }}</div>
+        {% if card.count is not null %}
+          <div class="dhcr-courses-card__count">[ {{ card.count }} ]</div>
+        {% endif %}
+      </a>
+    {% endfor %}
+  </div>
+</div>

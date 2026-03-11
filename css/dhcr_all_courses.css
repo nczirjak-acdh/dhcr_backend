@@ -1,0 +1,138 @@
+.dhcr-all-courses {
+  max-width: 1360px;
+}
+
+.dhcr-all-courses__heading {
+  margin: 0 0 18px;
+  color: #1f73b5;
+  text-transform: uppercase;
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
+.dhcr-all-courses__icon {
+  display: inline-block;
+  margin-right: 12px;
+}
+
+.dhcr-all-courses__legend-title {
+  margin-bottom: 8px;
+  font-size: 1.2rem;
+  text-decoration: underline;
+  color: #66707d;
+  font-weight: 700;
+}
+
+.dhcr-all-courses__legend-line {
+  font-size: 1.1rem;
+  color: #66707d;
+  margin: 2px 0;
+}
+
+.dhcr-all-courses__legend-line .green {
+  color: #0b8f22;
+  font-weight: 700;
+}
+
+.dhcr-all-courses__legend-line .orange {
+  color: #f08d00;
+  font-weight: 700;
+}
+
+.dhcr-all-courses__legend-line .red {
+  color: #df0000;
+  font-weight: 700;
+}
+
+.dhcr-all-courses__table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 1.2rem;
+}
+
+.dhcr-all-courses__table th {
+  color: #66707d;
+  text-align: left;
+  padding: 8px 10px;
+}
+
+.dhcr-all-courses__table th:nth-child(2),
+.dhcr-all-courses__table th:nth-child(3),
+.dhcr-all-courses__table th:nth-child(4) {
+  color: #0068c9;
+}
+
+.dhcr-all-courses__table th.sortable a {
+  color: #0068c9;
+  text-decoration: none;
+}
+
+.dhcr-all-courses__table th.sortable.is-active a {
+  font-weight: 700;
+}
+
+.dhcr-all-courses__table th.sortable.is-asc a::after {
+  content: " ^";
+  font-size: 0.9em;
+}
+
+.dhcr-all-courses__table th.sortable.is-desc a::after {
+  content: " v";
+  font-size: 0.9em;
+}
+
+.dhcr-all-courses__table td {
+  color: #66707d;
+  padding: 0;
+  vertical-align: top;
+}
+
+.dhcr-all-courses__table td:not(.actions):not(.updated) {
+  padding: 10px;
+}
+
+.dhcr-all-courses__table td a {
+  color: #0068c9;
+  text-decoration: none;
+}
+
+.dhcr-all-courses__table td.actions {
+  min-width: 110px;
+  padding: 10px;
+}
+
+.dhcr-all-courses__table td.actions a {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.dhcr-all-courses__table td.updated {
+  min-width: 120px;
+  color: #fff;
+  font-weight: 700;
+  padding: 12px 10px;
+}
+
+.dhcr-all-courses__table td.updated.green {
+  background: #7ed321;
+  color: #111;
+}
+
+.dhcr-all-courses__table td.updated.orange {
+  background: #f5a623;
+}
+
+.dhcr-all-courses__table td.updated.red {
+  background: #ff1f3d;
+}
+
+.dhcr-all-courses__table td.published.yes {
+  color: #0b8f22;
+  font-weight: 700;
+}
+
+.dhcr-all-courses__table td.published.no {
+  color: #df0000;
+  font-weight: 700;
+}

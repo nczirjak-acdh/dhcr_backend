@@ -1,0 +1,12 @@
+<div class="dhcr-statistics-placeholder">
+  <div class="dhcr-statistics-placeholder__crumbs">
+    <a href="{{ path('dhcr_backend.dashboard') }}">{{ 'Dashboard'|t }}</a>
+    <span>/</span>
+    <a href="{{ path('dhcr_backend.statistics') }}">{{ 'Statistics'|t }}</a>
+    <span>/</span>
+    <span>{{ heading }}</span>
+  </div>
+
+  <h2 class="dhcr-statistics-placeholder__heading"><i class="{{ icon }}" aria-hidden="true"></i> {{ heading }}</h2>
+  <p class="dhcr-statistics-placeholder__message">{{ message }}</p>
+</div>

@@ -1,0 +1,55 @@
+<div class="dhcr-all-courses dhcr-searchable-table">
+  <h2 class="dhcr-all-courses__heading">
+    {% if icon %}
+      <span class="dhcr-all-courses__icon" aria-hidden="true">{{ icon }}</span>
+    {% endif %}
+    {{ heading }}
+  </h2>
+
+  {% if show_legend %}
+    <div class="dhcr-all-courses__legend-title">{{ 'Course Status'|t }}</div>
+    <div class="dhcr-all-courses__legend-line"><span class="green">{{ 'Green:'|t }}</span> {{ 'Actively maintained'|t }}</div>
+    <div class="dhcr-all-courses__legend-line"><span class="orange">{{ 'Orange:'|t }}</span> {{ 'Reminder sent more than 1 month ago, needs to be updated'|t }}</div>
+    <div class="dhcr-all-courses__legend-line"><span class="red">{{ 'Red:'|t }}</span> {{ 'Outdated, not shown in the public registry'|t }}</div>
+  {% endif %}
+
+  {% if rows|length > 0 %}
+    <div class="dhcr-table-search">
+      <input class="dhcr-table-search__input" type="search" placeholder="{{ 'Search courses'|t }}" data-dhcr-table-search-input>
+    </div>
+    <table class="dhcr-all-courses__table" data-dhcr-table-search-table>
+      <thead>
+        <tr>
+          <th>{{ 'Actions'|t }}</th>
+          <th class="sortable{{ sort_links.updated.active ? ' is-active is-' ~ sort_links.updated.direction : '' }}">{{ sort_links.updated.text|raw }}</th>
+          <th class="sortable{{ sort_links.published.active ? ' is-active is-' ~ sort_links.published.direction : '' }}">{{ sort_links.published.text|raw }}</th>
+          <th class="sortable{{ sort_links.title.active ? ' is-active is-' ~ sort_links.title.direction : '' }}">{{ sort_links.title.text|raw }}</th>
+          <th>{{ 'Education Type'|t }}</th>
+          <th>{{ 'Institution'|t }}</th>
+          <th>{{ 'Course owner'|t }}</th>
+          <th>{{ 'Course URL'|t }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            <td class="actions">
+              {% for action in row.actions %}
+                <a href="{{ action.url }}">{{ action.label }}</a>
+              {% endfor %}
+            </td>
+            <td class="updated {{ row.updated_class }}">{{ row.updated_text }}</td>
+            <td class="published {{ row.published_class }}">{{ row.published_text }}</td>
+            <td><a href="{{ row.course_edit_url }}">{{ row.course_name }}</a></td>
+            <td>{{ row.education_type }}</td>
+            <td>{{ row.institution }}</td>
+            <td>{{ row.owner }}</td>
+            <td>{% if row.course_url %}<a href="{{ row.course_url }}" target="_blank" rel="noopener">{{ row.course_url_label }}</a>{% endif %}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>{{ empty }}</p>
+  {% endif %}
+</div>

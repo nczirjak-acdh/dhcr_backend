@@ -1,0 +1,26 @@
+<div class="dhcr-dashboard">
+  <h2 class="dhcr-dashboard__title">{{ 'Dashboard'|t }}</h2>
+
+  <p class="dhcr-dashboard__greeting">{{ greeting }}</p>
+
+  <div class="dhcr-dashboard__stats">
+    <span>{{ 'Course Approval:'|t }} <strong>{{ pending_approval }}</strong></span>
+    <span class="dhcr-dashboard__sep">|</span>
+    <a href="/content/dhcr/expired-courses"><span>{{ 'Course Expiry:'|t }} <strong>{{ expiry_candidates }}</strong></span></a>
+  </div>
+
+  <div class="dhcr-dashboard__subline">
+    {{ 'Subscribe to our mailing list to stay informed about the latest news and technical releases'|t }}
+  </div>
+
+  <h3 class="dhcr-dashboard__section">{{ 'Dashboard'|t }}</h3>
+
+  <div class="dhcr-dashboard__grid">
+    {% for card in cards %}
+      <a class="dhcr-card" href="{{ card.url }}">
+        <div class="dhcr-card__icon" aria-hidden="true"><i class="{{ card.icon }}"></i></div>
+        <div class="dhcr-card__title">{{ card.title }}</div>
+      </a>
+    {% endfor %}
+  </div>
+</div>

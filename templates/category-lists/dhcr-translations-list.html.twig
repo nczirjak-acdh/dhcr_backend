@@ -1,0 +1,34 @@
+<div class="dhcr-translations-list">
+  <h2 class="dhcr-translations-list__heading"><i class="fas fa-language" aria-hidden="true"></i><span>{{ 'Translations'|t }}</span></h2>
+
+  <a class="dhcr-translations-list__add" href="{{ add_url }}">{{ 'Add Translation'|t }}</a>
+
+  <p class="dhcr-translations-list__intro">{{ 'List of translations for the user invitation email'|t }}</p>
+
+  {% if rows|length > 0 %}
+    <table class="dhcr-translations-list__table">
+      <thead>
+        <tr>
+          <th class="sortable{{ sort_links.sort_order.active ? ' is-active is-' ~ sort_links.sort_order.direction : '' }}">{{ sort_links.sort_order.text|raw }}</th>
+          <th class="sortable{{ sort_links.language.active ? ' is-active is-' ~ sort_links.language.direction : '' }}">{{ sort_links.language.text|raw }}</th>
+          <th class="sortable{{ sort_links.subject.active ? ' is-active is-' ~ sort_links.subject.direction : '' }}">{{ sort_links.subject.text|raw }}</th>
+          <th class="sortable{{ sort_links.published.active ? ' is-active is-' ~ sort_links.published.direction : '' }}">{{ sort_links.published.text|raw }}</th>
+          <th>{{ 'Action'|t }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            <td>{{ row.sort_order }}</td>
+            <td>{{ row.language }}</td>
+            <td class="dhcr-translations-list__subject">{{ row.subject_display }}</td>
+            <td>{{ row.published }}</td>
+            <td><a href="{{ row.edit_url }}">{{ 'Edit'|t }}</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>{{ empty }}</p>
+  {% endif %}
+</div>

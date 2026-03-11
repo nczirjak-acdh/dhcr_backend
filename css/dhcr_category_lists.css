@@ -1,0 +1,107 @@
+.dhcr-category-lists {
+  max-width: 1400px;
+}
+
+.dhcr-category-lists__crumbs {
+  display: flex;
+  gap: 10px;
+  font-size: 1.5rem;
+  margin-bottom: 26px;
+}
+
+.dhcr-category-lists__crumbs a {
+  color: #1f73b5;
+  text-decoration: none;
+}
+
+.dhcr-category-lists__heading {
+  margin: 0 0 24px;
+  color: #1f73b5;
+  text-transform: uppercase;
+  font-size: 1.75rem;
+}
+
+.dhcr-category-lists__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 250px));
+  justify-content: start;
+  gap: 16px;
+}
+
+.dhcr-category-card {
+  width: 250px;
+  min-width: 250px;
+  max-width: 250px;
+  min-height: 180px;
+  border-radius: 38px;
+  background: #1f73b5;
+  color: #fff;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  justify-self: start;
+  padding: 14px;
+  transition: background-color 0.16s ease, transform 0.16s ease;
+}
+
+.dhcr-category-card:hover,
+.dhcr-category-card:focus {
+  background: #185d93;
+  transform: scale(1.04);
+}
+
+.dhcr-category-card__icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.dhcr-category-card__icon i {
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.dhcr-category-card__title {
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.1;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.dhcr-category-card__count {
+  margin-top: 8px;
+  color: #93df31;
+  font-size: 1.5rem;
+  line-height: 1;
+  font-weight: 800;
+}
+
+@media (max-width: 1200px) {
+  .dhcr-category-lists__grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 250px));
+  }
+}
+
+@media (max-width: 767px) {
+  .dhcr-category-lists__crumbs {
+    font-size: 1rem;
+  }
+
+  .dhcr-category-lists__heading {
+    font-size: 1.5rem;
+  }
+
+  .dhcr-category-lists__grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 250px));
+  }
+
+  .dhcr-category-card__icon,
+  .dhcr-category-card__title,
+  .dhcr-category-card__count {
+    font-size: 1rem;
+  }
+}

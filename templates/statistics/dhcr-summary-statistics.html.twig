@@ -1,0 +1,42 @@
+<div class="dhcr-summary-stats">
+  <div class="dhcr-summary-stats__crumbs">
+    <a href="{{ path('dhcr_backend.dashboard') }}">{{ 'Dashboard'|t }}</a>
+    <span>/</span>
+    <a href="{{ path('dhcr_backend.statistics') }}">{{ 'Statistics'|t }}</a>
+    <span>/</span>
+    <span>{{ 'Summary Statistics'|t }}</span>
+  </div>
+
+  <h2 class="dhcr-summary-stats__heading"><i class="fas fa-chart-bar" aria-hidden="true"></i> {{ 'Summary Statistics'|t }}</h2>
+
+  <div class="dhcr-summary-stats__updated">{{ 'Data updated at:'|t }} {{ updated_at }}</div>
+
+  {% for row in rows %}
+    <div class="dhcr-summary-stats__row">
+      {% for block in row %}
+        <section class="dhcr-summary-block">
+          <h3 class="dhcr-summary-block__title"><i class="{{ block.icon }}" aria-hidden="true"></i> {{ block.title }}</h3>
+          <ul class="dhcr-summary-block__list">
+            {% for item in block.items %}
+              <li class="dhcr-summary-block__item{% if item.level is defined and item.level > 1 %} dhcr-summary-block__item--nested{% endif %}">
+                {{ item.label }}: <strong>{{ item.value }}</strong>
+              </li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endfor %}
+    </div>
+  {% endfor %}
+
+  <div class="dhcr-summary-stats__notes">
+    {% for note in notes %}
+      {% if loop.first %}
+        <p class="dhcr-summary-stats__note">{{ note }}</p>
+      {% elseif loop.last %}
+        <p class="dhcr-summary-stats__note dhcr-summary-stats__note--italic">{{ note }}</p>
+      {% else %}
+        <p class="dhcr-summary-stats__note">{{ note }}</p>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>

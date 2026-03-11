@@ -1,0 +1,259 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_theme().
+ */
+function dhcr_backend_theme(): array {
+  $module_path = \Drupal::service('extension.list.module')->getPath('dhcr_backend');
+  $templates_path = $module_path . '/templates';
+
+  return [
+    'dhcr_dashboard' => [
+      'variables' => [
+        'greeting' => NULL,
+        'pending_approval' => 0,
+        'expiry_candidates' => 0,
+        'cards' => [],
+      ],
+      'template' => 'dhcr-dashboard',
+      'path' => $templates_path . '/dashboard',
+    ],
+    'dhcr_courses_admin' => [
+      'variables' => [
+        'cards' => [],
+      ],
+      'template' => 'dhcr-courses-admin',
+      'path' => $templates_path . '/courses',
+    ],
+    'dhcr_contributor_network' => [
+      'variables' => [
+        'cards' => [],
+      ],
+      'template' => 'dhcr-contributor-network',
+      'path' => $templates_path . '/contributor-network',
+    ],
+    'dhcr_needs_attention' => [
+      'variables' => [
+        'cards' => [],
+      ],
+      'template' => 'dhcr-needs-attention',
+      'path' => $templates_path . '/needs-attention',
+    ],
+    'dhcr_category_lists' => [
+      'variables' => [
+        'cards' => [],
+      ],
+      'template' => 'dhcr-category-lists',
+      'path' => $templates_path . '/category-lists',
+    ],
+    'dhcr_help' => [
+      'variables' => [
+        'cards' => [],
+      ],
+      'template' => 'dhcr-help',
+      'path' => $templates_path . '/help',
+    ],
+    'dhcr_moderator_faq' => [
+      'variables' => [
+        'items' => [],
+        'edit_url' => '',
+      ],
+      'template' => 'dhcr-moderator-faq',
+      'path' => $templates_path . '/help',
+    ],
+    'dhcr_statistics_menu' => [
+      'variables' => [
+        'cards' => [],
+      ],
+      'template' => 'dhcr-statistics-menu',
+      'path' => $templates_path . '/statistics',
+    ],
+    'dhcr_summary_statistics' => [
+      'variables' => [
+        'updated_at' => '',
+        'rows' => [],
+        'notes' => [],
+      ],
+      'template' => 'dhcr-summary-statistics',
+      'path' => $templates_path . '/statistics',
+    ],
+    'dhcr_course_statistics' => [
+      'variables' => [
+        'updated_at' => '',
+        'key_data' => [],
+        'chart_updated_courses' => [],
+        'chart_archived_soon_courses' => [],
+        'chart_new_courses' => [],
+        'chart_course_counts_per_country' => [],
+        'chart_course_counts_per_educ_type' => [],
+        'country_counts_table' => [],
+        'education_type_table' => [],
+        'outdated_by_country_table' => [],
+        'new_courses_top' => [],
+      ],
+      'template' => 'dhcr-course-statistics',
+      'path' => $templates_path . '/statistics',
+    ],
+    'dhcr_user_statistics' => [
+      'variables' => [
+        'updated_at' => '',
+        'key_data' => [],
+        'chart_users' => [],
+        'chart_moderators' => [],
+      ],
+      'template' => 'dhcr-user-statistics',
+      'path' => $templates_path . '/statistics',
+    ],
+    'dhcr_statistics_placeholder' => [
+      'variables' => [
+        'heading' => '',
+        'icon' => '',
+        'message' => '',
+      ],
+      'template' => 'dhcr-statistics-placeholder',
+      'path' => $templates_path . '/statistics',
+    ],
+    'dhcr_all_courses_list' => [
+      'variables' => [
+        'heading' => '',
+        'icon' => '',
+        'show_legend' => TRUE,
+        'sort_links' => [],
+        'rows' => [],
+        'empty' => '',
+      ],
+      'template' => 'dhcr-all-courses-list',
+      'path' => $templates_path . '/courses',
+    ],
+    'dhcr_cities_list' => [
+      'variables' => [
+        'add_url' => '',
+        'sort_links' => [],
+        'rows' => [],
+        'empty' => '',
+      ],
+      'template' => 'dhcr-cities-list',
+      'path' => $templates_path . '/category-lists',
+    ],
+    'dhcr_institutions_list' => [
+      'variables' => [
+        'add_url' => '',
+        'sort_links' => [],
+        'rows' => [],
+        'empty' => '',
+      ],
+      'template' => 'dhcr-institutions-list',
+      'path' => $templates_path . '/category-lists',
+    ],
+    'dhcr_languages_list' => [
+      'variables' => [
+        'add_url' => '',
+        'sort_links' => [],
+        'rows' => [],
+        'empty' => '',
+      ],
+      'template' => 'dhcr-languages-list',
+      'path' => $templates_path . '/category-lists',
+    ],
+    'dhcr_translations_list' => [
+      'variables' => [
+        'add_url' => '',
+        'sort_links' => [],
+        'rows' => [],
+        'empty' => '',
+      ],
+      'template' => 'dhcr-translations-list',
+      'path' => $templates_path . '/category-lists',
+    ],
+    'dhcr_countries_list' => [
+      'variables' => [
+        'add_url' => '',
+        'sort_links' => [],
+        'rows' => [],
+        'empty' => '',
+      ],
+      'template' => 'dhcr-countries-list',
+      'path' => $templates_path . '/category-lists',
+    ],
+    'dhcr_external_resources_list' => [
+      'variables' => [
+        'title_suffix' => '',
+        'add_url' => '',
+        'sort_links' => [],
+        'rows' => [],
+        'empty' => '',
+      ],
+      'template' => 'dhcr-external-resources-list',
+      'path' => $templates_path . '/courses',
+    ],
+    'dhcr_faq_questions_list' => [
+      'variables' => [
+        'add_url' => '',
+        'sort_links' => [],
+        'rows' => [],
+        'empty' => '',
+      ],
+      'template' => 'dhcr-faq-questions-list',
+      'path' => $templates_path . '/category-lists',
+    ],
+    'dhcr_account_approval' => [
+      'variables' => [
+        'rows' => [],
+        'count' => 0,
+      ],
+      'template' => 'dhcr-account-approval',
+      'path' => $templates_path . '/needs-attention',
+    ],
+    'dhcr_all_users' => [
+      'variables' => [
+        'heading' => '',
+        'icon' => '',
+        'rows' => [],
+        'sort_links' => [],
+        'pager' => [],
+      ],
+      'template' => 'dhcr-all-users',
+      'path' => $templates_path . '/contributor-network',
+    ],
+    'dhcr_pending_invitations' => [
+      'variables' => [
+        'heading' => '',
+        'icon' => '',
+        'rows' => [],
+        'sort_links' => [],
+        'pager' => [],
+      ],
+      'template' => 'dhcr-pending-invitations',
+      'path' => $templates_path . '/contributor-network',
+    ],
+    'dhcr_moderators' => [
+      'variables' => [
+        'heading' => '',
+        'icon' => '',
+        'rows' => [],
+        'sort_links' => [],
+        'pager' => [],
+      ],
+      'template' => 'dhcr-moderators',
+      'path' => $templates_path . '/contributor-network',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+function dhcr_backend_page_attachments(array &$attachments): void {
+  $route_name = \Drupal::routeMatch()->getRouteName() ?? '';
+
+  if (
+    str_starts_with($route_name, 'dhcr_backend.') ||
+    str_starts_with($route_name, 'entity.dhcr_')
+  ) {
+    $attachments['#attached']['library'][] = 'dhcr_backend/admin_base';
+    $attachments['#attached']['library'][] = 'dhcr_backend/fontawesome_free';
+    $attachments['#attached']['library'][] = 'dhcr_backend/admin_table_search';
+  }
+}

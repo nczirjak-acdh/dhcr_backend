@@ -1,0 +1,186 @@
+.dhcr-contributor-network {
+  max-width: 980px;
+}
+
+.dhcr-contributor-network__heading,
+.dhcr-users-view__heading,
+.dhcr-invite-user-form__heading {
+  margin: 0 0 24px;
+  color: #1f73b5;
+  text-transform: uppercase;
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
+.dhcr-contributor-network__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 250px));
+  justify-content: start;
+  gap: 16px;
+}
+
+.dhcr-contributor-card {
+  width: 250px;
+  min-width: 250px;
+  max-width: 250px;
+  min-height: 180px;
+  border-radius: 34px;
+  background: #1f73b5;
+  color: #fff;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  justify-self: start;
+  padding: 20px;
+  transition: transform 0.18s ease, background-color 0.18s ease;
+}
+
+.dhcr-contributor-card:hover,
+.dhcr-contributor-card:focus {
+  transform: scale(1.04);
+}
+
+.dhcr-contributor-card__icon {
+  font-size: 1.75rem;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.dhcr-contributor-card__icon i {
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.dhcr-contributor-card__title {
+  font-size: 1rem;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.05;
+  font-weight: 800;
+}
+
+.dhcr-contributor-card__count {
+  margin-top: 8px;
+  color: #93df31;
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
+.dhcr-users-view__icon {
+  display: inline-block;
+  margin-right: 12px;
+}
+
+.dhcr-users-view__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.1rem;
+}
+
+.dhcr-users-view__table th {
+  color: #66707d;
+  text-align: left;
+  padding: 10px 12px;
+}
+
+.dhcr-users-view__table th.sortable a {
+  color: #0068c9;
+  text-decoration: none;
+}
+
+.dhcr-users-view__table th.sortable.is-active a {
+  font-weight: 700;
+}
+
+.dhcr-users-view__table th.sortable.is-asc a::after {
+  content: " ^";
+}
+
+.dhcr-users-view__table th.sortable.is-desc a::after {
+  content: " v";
+}
+
+.dhcr-users-view__table td {
+  color: #66707d;
+  padding: 10px 12px;
+  vertical-align: top;
+}
+
+.dhcr-users-view__table td.actions a {
+  display: block;
+  color: #0068c9;
+  text-decoration: none;
+}
+
+.dhcr-users-view__table td.enabled {
+  color: #0b8f22;
+  font-weight: 700;
+}
+
+.dhcr-users-view__pager,
+.dhcr-users-view__summary,
+.dhcr-invite-user-form__intro,
+.dhcr-invite-user-form__step-copy,
+.dhcr-invite-user-form__preview-list,
+.dhcr-invite-user-form__note-title,
+.dhcr-invite-user-form__preview-title {
+  color: #66707d;
+  font-size: 1.1rem;
+}
+
+.dhcr-users-view__pager {
+  margin: 18px 0 24px;
+}
+
+.dhcr-users-view__pager a {
+  color: #0068c9;
+  text-decoration: none;
+  margin-right: 20px;
+}
+
+.dhcr-invite-user-form fieldset {
+  border: 2px solid #b3b8be;
+  margin: 0 0 24px;
+}
+
+.dhcr-invite-user-form label {
+  color: #1f73b5;
+  font-weight: 700;
+}
+
+.dhcr-invite-user-form input[type="text"],
+.dhcr-invite-user-form input[type="email"],
+.dhcr-invite-user-form select,
+.dhcr-invite-user-form textarea {
+  border: 2px solid #1f73b5;
+  border-radius: 9px;
+}
+
+.dhcr-invite-user-form__step-title {
+  color: #1f73b5;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 18px 0 12px;
+}
+
+.dhcr-invite-user-form__note-title {
+  font-weight: 700;
+  text-decoration: underline;
+  margin-top: 10px;
+}
+
+.dhcr-invite-user-form .button--dhcr-outline {
+  display: inline-block;
+  border: 4px solid #1f73b5;
+  color: #1f73b5;
+  border-radius: 999px;
+  background: transparent;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 1.6rem;
+  font-weight: 800;
+  padding: 12px 28px;
+  margin: 0 0 26px;
+}

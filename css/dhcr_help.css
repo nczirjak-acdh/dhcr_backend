@@ -1,0 +1,62 @@
+.dhcr-faq-content {
+  max-width: 980px;
+}
+
+.dhcr-faq-content__heading {
+  margin: 0 0 20px;
+  color: #1f73b5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-transform: none;
+}
+
+.dhcr-faq-content__heading i {
+  font-size: 1em;
+}
+
+.dhcr-faq-content__contents-title {
+  margin: 0 0 6px;
+}
+
+.dhcr-faq-content__edit-link {
+  margin: 0 0 14px;
+}
+
+.dhcr-faq-content__edit-link a {
+  color: #0068c9;
+  text-decoration: none;
+}
+
+.dhcr-faq-content__contents-list {
+  margin: 0 0 24px 18px;
+}
+
+.dhcr-faq-content__contents-list li {
+  margin-bottom: 4px;
+}
+
+.dhcr-faq-content__contents-list a {
+  color: #0068c9;
+  text-decoration: none;
+}
+
+.dhcr-faq-content__item {
+  margin-bottom: 20px;
+}
+
+.dhcr-faq-content__item h3 {
+  margin: 0 0 8px;
+  color: #3e4550;
+}
+
+.dhcr-faq-content__item p {
+  margin: 0 0 8px;
+  color: #5f6772;
+  line-height: 1.5;
+}
+
+.dhcr-faq-content__item a {
+  color: #0068c9;
+  text-decoration: none;
+}

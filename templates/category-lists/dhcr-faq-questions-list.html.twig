@@ -1,0 +1,37 @@
+<div class="dhcr-faq-questions-list dhcr-searchable-table">
+  <h2 class="dhcr-faq-questions-list__heading">{{ 'FAQ Questions'|t }}</h2>
+
+  <a class="dhcr-faq-questions-list__add" href="{{ add_url }}">{{ 'Add FAQ Question'|t }}</a>
+
+  {% if rows|length > 0 %}
+    <div class="dhcr-table-search">
+      <input class="dhcr-table-search__input" type="search" placeholder="{{ 'Search FAQ questions'|t }}" data-dhcr-table-search-input>
+    </div>
+    <table class="dhcr-faq-questions-list__table" data-dhcr-table-search-table>
+      <thead>
+        <tr>
+          <th class="sortable{{ sort_links.id.active ? ' is-active is-' ~ sort_links.id.direction : '' }}">{{ sort_links.id.text|raw }}</th>
+          <th class="sortable{{ sort_links.category.active ? ' is-active is-' ~ sort_links.category.direction : '' }}">{{ sort_links.category.text|raw }}</th>
+          <th class="sortable{{ sort_links.sort_order.active ? ' is-active is-' ~ sort_links.sort_order.direction : '' }}">{{ sort_links.sort_order.text|raw }}</th>
+          <th class="sortable{{ sort_links.question.active ? ' is-active is-' ~ sort_links.question.direction : '' }}">{{ sort_links.question.text|raw }}</th>
+          <th class="sortable{{ sort_links.published.active ? ' is-active is-' ~ sort_links.published.direction : '' }}">{{ sort_links.published.text|raw }}</th>
+          <th>{{ 'Action'|t }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            <td>{{ row.id }}</td>
+            <td>{{ row.category }}</td>
+            <td>{{ row.sort_order }}</td>
+            <td>{{ row.question }}</td>
+            <td>{{ row.published }}</td>
+            <td><a href="{{ row.edit_url }}">{{ 'Edit'|t }}</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>{{ empty }}</p>
+  {% endif %}
+</div>

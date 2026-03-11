@@ -1,0 +1,33 @@
+<div class="dhcr-cities-list dhcr-searchable-table">
+  <h2 class="dhcr-cities-list__heading">{{ 'Cities'|t }}</h2>
+
+  <a class="dhcr-cities-list__add" href="{{ add_url }}">{{ 'Add City'|t }}</a>
+
+  {% if rows|length > 0 %}
+    <div class="dhcr-table-search">
+      <input class="dhcr-table-search__input" type="search" placeholder="{{ 'Search cities'|t }}" data-dhcr-table-search-input>
+    </div>
+    <table class="dhcr-cities-list__table" data-dhcr-table-search-table>
+      <thead>
+        <tr>
+          <th class="sortable{{ sort_links.id.active ? ' is-active is-' ~ sort_links.id.direction : '' }}">{{ sort_links.id.text|raw }}</th>
+          <th class="sortable{{ sort_links.name.active ? ' is-active is-' ~ sort_links.name.direction : '' }}">{{ sort_links.name.text|raw }}</th>
+          <th class="sortable{{ sort_links.country.active ? ' is-active is-' ~ sort_links.country.direction : '' }}">{{ sort_links.country.text|raw }}</th>
+          <th>{{ 'Action'|t }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            <td>{{ row.id }}</td>
+            <td>{{ row.name }}</td>
+            <td>{{ row.country }}</td>
+            <td><a href="{{ row.edit_url }}">{{ 'Edit'|t }}</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>{{ empty }}</p>
+  {% endif %}
+</div>

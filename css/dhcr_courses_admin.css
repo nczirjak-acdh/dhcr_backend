@@ -1,0 +1,94 @@
+.dhcr-courses-admin {
+  max-width: 980px;
+}
+
+.dhcr-courses-admin__heading {
+  margin: 0 0 28px;
+  color: #1f73b5;
+  font-size: 1.75rem;
+  text-transform: uppercase;
+}
+
+.dhcr-courses-admin__hint {
+  margin: 0 0 28px;
+  color: #66707d;
+  font-size: 1.25rem;
+  line-height: 1.3;
+}
+
+.dhcr-courses-admin__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 250px));
+  justify-content: start;
+  gap: 16px;
+}
+
+.dhcr-courses-card {
+  width: 250px;
+  min-width: 250px;
+  max-width: 250px;
+  min-height: 180px;
+  border-radius: 34px;
+  background: #1f73b5;
+  color: #fff;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  justify-self: start;
+  padding: 20px;
+  transition: background-color 0.16s ease, transform 0.16s ease;
+}
+
+.dhcr-courses-card:hover,
+.dhcr-courses-card:focus {
+  background: #185d93;
+  transform: scale(1.04);
+}
+
+.dhcr-courses-card__icon {
+  font-size: 1.75rem;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.dhcr-courses-card__icon i {
+  display: inline-block;
+}
+
+.dhcr-courses-card__title {
+  font-size: 1rem;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.05;
+  font-weight: 800;
+}
+
+.dhcr-courses-card__count {
+  margin-top: 8px;
+  color: #93df31;
+  font-size: 1.75rem;
+  line-height: 1;
+  font-weight: 800;
+}
+
+@media (max-width: 767px) {
+  .dhcr-courses-admin__heading {
+    font-size: 1.5rem;
+  }
+
+  .dhcr-courses-admin__hint {
+    font-size: 1.1rem;
+  }
+
+  .dhcr-courses-admin__grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 250px));
+  }
+
+  .dhcr-courses-card__title,
+  .dhcr-courses-card__count,
+  .dhcr-courses-card__icon {
+    font-size: 1rem;
+  }
+}

@@ -1,0 +1,19 @@
+<div class="dhcr-needs-attention">
+  <div class="dhcr-needs-attention__crumbs">
+    <a href="/admin/content/dhcr">{{ 'Dashboard'|t }}</a>
+    <span>/</span>
+    <span>{{ 'Needs Attention'|t }}</span>
+  </div>
+
+  <h2 class="dhcr-needs-attention__heading">{{ 'Needs Attention'|t }}</h2>
+
+  <div class="dhcr-needs-attention__grid">
+    {% for card in cards %}
+      <a class="dhcr-needs-card" href="{{ card.url }}">
+        <div class="dhcr-needs-card__icon" aria-hidden="true"><i class="{{ card.icon }}"></i></div>
+        <div class="dhcr-needs-card__title">{{ card.title }}</div>
+        <div class="dhcr-needs-card__count">[ {{ card.count }} ]</div>
+      </a>
+    {% endfor %}
+  </div>
+</div>

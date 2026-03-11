@@ -1,0 +1,3 @@
+administer dhcr backend:
+  title: 'Administer DHCR backend'
+  description: 'Full administrative access to DHCR backend entities and workflows.'

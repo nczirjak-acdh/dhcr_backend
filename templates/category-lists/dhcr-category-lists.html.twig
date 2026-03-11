@@ -1,0 +1,21 @@
+<div class="dhcr-category-lists">
+  <div class="dhcr-category-lists__crumbs">
+    <a href="/admin/content/dhcr">{{ 'Dashboard'|t }}</a>
+    <span>/</span>
+    <span>{{ 'Category Lists'|t }}</span>
+  </div>
+
+  <h2 class="dhcr-category-lists__heading">{{ 'Category Lists'|t }}</h2>
+
+  <div class="dhcr-category-lists__grid">
+    {% for card in cards %}
+      <a class="dhcr-category-card" href="{{ card.url }}">
+        <div class="dhcr-category-card__icon" aria-hidden="true"><i class="{{ card.icon }}"></i></div>
+        <div class="dhcr-category-card__title">{{ card.title }}</div>
+        {% if card.count is not null %}
+          <div class="dhcr-category-card__count">[ {{ card.count }} ]</div>
+        {% endif %}
+      </a>
+    {% endfor %}
+  </div>
+</div>

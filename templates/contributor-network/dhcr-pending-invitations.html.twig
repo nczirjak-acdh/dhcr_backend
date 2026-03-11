@@ -1,0 +1,47 @@
+<div class="dhcr-users-view dhcr-searchable-table">
+  <h2 class="dhcr-users-view__heading"><span class="dhcr-users-view__icon" aria-hidden="true">{{ icon }}</span>{{ heading }}</h2>
+
+  <div class="dhcr-table-search">
+    <input class="dhcr-table-search__input" type="search" placeholder="{{ 'Search pending invitations'|t }}" data-dhcr-table-search-input>
+  </div>
+  <table class="dhcr-users-view__table" data-dhcr-table-search-table>
+    <thead>
+      <tr>
+        <th>{{ 'Actions'|t }}</th>
+        <th class="sortable{{ sort_links.last_name.active ? ' is-active is-' ~ sort_links.last_name.direction : '' }}">{{ sort_links.last_name.text|raw }}</th>
+        <th class="sortable{{ sort_links.first_name.active ? ' is-active is-' ~ sort_links.first_name.direction : '' }}">{{ sort_links.first_name.text|raw }}</th>
+        <th class="sortable{{ sort_links.email.active ? ' is-active is-' ~ sort_links.email.direction : '' }}">{{ sort_links.email.text|raw }}</th>
+        <th class="sortable{{ sort_links.enabled.active ? ' is-active is-' ~ sort_links.enabled.direction : '' }}">{{ sort_links.enabled.text|raw }}</th>
+        <th>{{ 'Institution'|t }}</th>
+        <th class="sortable{{ sort_links.valid_until.active ? ' is-active is-' ~ sort_links.valid_until.direction : '' }}">{{ sort_links.valid_until.text|raw }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+        <tr data-dhcr-search-text="{{ [row.last_name, row.first_name, row.email, row.enabled, row.institution, row.valid_until]|join(' ')|lower|trim }}">
+          <td class="actions">
+            <a href="{{ row.reinvite_url }}">{{ 'Reinvite'|t }}</a>
+            <a href="{{ row.view_url }}">{{ 'View'|t }}</a>
+            <a href="{{ row.edit_url }}">{{ 'Edit'|t }}</a>
+          </td>
+          <td>{{ row.last_name }}</td>
+          <td>{{ row.first_name }}</td>
+          <td>{{ row.email }}</td>
+          <td class="{{ row.enabled == 'Yes' ? 'enabled' : '' }}">{{ row.enabled }}</td>
+          <td>{{ row.institution }}</td>
+          <td>{{ row.valid_until }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="dhcr-users-view__pager">
+    {% if pager.previous_url %}
+      <a href="{{ pager.previous_url }}">&lt; previous</a>
+    {% endif %}
+    {% if pager.next_url %}
+      <a href="{{ pager.next_url }}">next &gt;</a>
+    {% endif %}
+  </div>
+  <div class="dhcr-users-view__summary">{{ 'Page @current of @pages, showing @count record(s) out of @total total'|t({'@current': pager.current, '@pages': pager.total_pages, '@count': rows|length, '@total': pager.total_items}) }}</div>
+</div>

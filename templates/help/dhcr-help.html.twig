@@ -1,0 +1,12 @@
+<div class="dhcr-dashboard">
+  <h2 class="dhcr-dashboard__section">{{ 'Help'|t }}</h2>
+
+  <div class="dhcr-dashboard__grid">
+    {% for card in cards %}
+      <a class="dhcr-card" href="{{ card.url }}">
+        <div class="dhcr-card__icon" aria-hidden="true"><i class="{{ card.icon }}"></i></div>
+        <div class="dhcr-card__title">{{ card.title }}</div>
+      </a>
+    {% endfor %}
+  </div>
+</div>

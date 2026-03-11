@@ -1,0 +1,43 @@
+<div class="dhcr-external-resources-list dhcr-searchable-table">
+  <h2 class="dhcr-external-resources-list__heading">{{ 'External Resources'|t }}{{ title_suffix }}</h2>
+
+  <a class="dhcr-external-resources-list__add" href="{{ add_url }}">{{ 'Add External Resource'|t }}</a>
+
+  {% if rows|length > 0 %}
+    <div class="dhcr-table-search">
+      <input class="dhcr-table-search__input" type="search" placeholder="{{ 'Search external resources'|t }}" data-dhcr-table-search-input>
+    </div>
+    <table class="dhcr-external-resources-list__table" data-dhcr-table-search-table>
+      <thead>
+        <tr>
+          <th class="sortable{{ sort_links.id.active ? ' is-active is-' ~ sort_links.id.direction : '' }}">{{ sort_links.id.text|raw }}</th>
+          <th class="sortable{{ sort_links.title.active ? ' is-active is-' ~ sort_links.title.direction : '' }}">{{ sort_links.title.text|raw }}</th>
+          <th class="sortable{{ sort_links.course.active ? ' is-active is-' ~ sort_links.course.direction : '' }}">{{ sort_links.course.text|raw }}</th>
+          <th class="sortable{{ sort_links.type.active ? ' is-active is-' ~ sort_links.type.direction : '' }}">{{ sort_links.type.text|raw }}</th>
+          <th class="sortable{{ sort_links.visible.active ? ' is-active is-' ~ sort_links.visible.direction : '' }}">{{ sort_links.visible.text|raw }}</th>
+          <th>{{ 'Url'|t }}</th>
+          <th>{{ 'Action'|t }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            <td>{{ row.id }}</td>
+            <td>{{ row.title }}</td>
+            <td>{{ row.course }}</td>
+            <td>{{ row.type }}</td>
+            <td>{{ row.visible }}</td>
+            <td>
+              {% if row.resource_url %}
+                <a href="{{ row.resource_url }}">{{ 'Link'|t }}</a>
+              {% endif %}
+            </td>
+            <td><a href="{{ row.edit_url }}">{{ 'Edit'|t }}</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>{{ empty }}</p>
+  {% endif %}
+</div>

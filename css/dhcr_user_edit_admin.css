@@ -1,0 +1,90 @@
+.dhcr-user-edit-form {
+  max-width: 980px;
+}
+
+.dhcr-user-edit-form h3 {
+  color: #1f73b5;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 22px 0 10px;
+}
+
+.dhcr-user-edit-form .form-item {
+  margin: 0 0 18px;
+}
+
+.dhcr-user-edit-form label {
+  color: #1f73b5;
+  font-weight: 700;
+}
+
+.dhcr-user-edit-form input[type="text"],
+.dhcr-user-edit-form input[type="email"],
+.dhcr-user-edit-form select,
+.dhcr-user-edit-form textarea {
+  width: 100%;
+  max-width: 100%;
+  border: 2px solid #1f73b5;
+  border-radius: 9px;
+  padding: 10px 12px;
+  color: #111;
+}
+
+.dhcr-user-edit-form textarea {
+  min-height: 120px;
+}
+
+.dhcr-user-edit-form__status-lines {
+  color: #636970;
+  line-height: 1.5;
+}
+
+.dhcr-user-edit-form__status-lines .is-yes {
+  color: #0d8d26;
+  font-weight: 700;
+}
+
+.dhcr-user-edit-form__status-lines .is-no {
+  color: #d14343;
+  font-weight: 700;
+}
+
+.dhcr-user-edit-form .form-type-checkbox {
+  margin: 0 0 18px;
+  padding-left: 12px;
+}
+
+.dhcr-user-edit-form .form-type-checkbox label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #1f73b5;
+  font-weight: 700;
+}
+
+.dhcr-user-edit-form input[type="checkbox"] {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px;
+  min-height: 20px;
+  margin: 0;
+  accent-color: #1f73b5;
+}
+
+.dhcr-user-edit-form__note {
+  color: #d14343;
+}
+
+.dhcr-user-edit-form .button,
+.dhcr-user-edit-form input[type="submit"] {
+  display: inline-block;
+  border: 4px solid #1f73b5;
+  color: #1f73b5;
+  border-radius: 999px;
+  background: transparent;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 1rem;
+  font-weight: 800;
+  padding: 10px 26px;
+}

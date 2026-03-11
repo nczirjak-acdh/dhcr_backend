@@ -1,0 +1,33 @@
+<div class="dhcr-account-approval dhcr-searchable-table">
+  <h2 class="dhcr-account-approval__heading">{{ 'Account Approval'|t }}</h2>
+
+  {% if rows %}
+    <div class="dhcr-table-search">
+      <input class="dhcr-table-search__input" type="search" placeholder="{{ 'Search accounts'|t }}" data-dhcr-table-search-input>
+    </div>
+    <table class="dhcr-account-approval__table" data-dhcr-table-search-table>
+      <thead>
+        <tr>
+          <th>{{ 'Name'|t }}</th>
+          <th>{{ 'E-Mail'|t }}</th>
+          <th>{{ 'Action'|t }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            <td>{{ row.name }}</td>
+            <td>{{ row.mail }}</td>
+            <td><a href="{{ row.edit_url }}">{{ 'Edit'|t }}</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p class="dhcr-account-approval__summary">{{ 'Page 1 of 1, showing @count record(s) out of @count total'|t({'@count': count}) }}</p>
+  {% else %}
+    <p class="dhcr-account-approval__message">{{ 'No pending account requests.'|t }}</p>
+    <p class="dhcr-account-approval__message">{{ 'You are up to date!'|t }}</p>
+    <p class="dhcr-account-approval__pager">&lt; previous &nbsp;&nbsp; next &gt;</p>
+    <p class="dhcr-account-approval__summary">{{ 'Page 1 of 1, showing 0 record(s) out of 0 total'|t }}</p>
+  {% endif %}
+</div>

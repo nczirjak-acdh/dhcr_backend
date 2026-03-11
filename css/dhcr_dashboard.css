@@ -1,0 +1,128 @@
+.dhcr-dashboard {
+  max-width: 1320px;
+  margin: 0;
+}
+
+.dhcr-dashboard__title {
+  margin: 0 0 24px;
+  color: #1f73b5;
+  font-size: 2rem;
+}
+
+.dhcr-dashboard__greeting {
+  margin: 0 0 24px;
+  color: #566070;
+  font-size: 1.25rem;
+  line-height: 1.35;
+}
+
+.dhcr-dashboard__stats {
+  color: #4f9a44;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 20px;
+}
+
+.dhcr-dashboard__sep {
+  margin: 0 14px;
+}
+
+.dhcr-dashboard__subline {
+  color: #4f9a44;
+  font-size: 1.25rem;
+  line-height: 1.25;
+  font-weight: 700;
+  margin: 0 0 34px;
+}
+
+.dhcr-dashboard__section {
+  margin: 0 0 24px;
+  color: #0f4f88;
+  font-size: 1.75rem;
+  text-transform: uppercase;
+}
+
+.dhcr-dashboard__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 250px));
+  justify-content: start;
+  gap: 16px;
+}
+
+.dhcr-card {
+  width: 250px;
+  min-width: 250px;
+  max-width: 250px;
+  min-height: 180px;
+  background: #1f73b5;
+  border-radius: 30px;
+  text-decoration: none;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  text-transform: uppercase;
+  transition: transform 0.18s ease, background-color 0.18s ease;
+  padding: 16px;
+}
+
+.dhcr-card:hover,
+.dhcr-card:focus {
+  background: #185d93;
+  transform: scale(1.04);
+}
+
+.dhcr-card__icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  margin-bottom: 18px;
+  font-weight: 700;
+}
+
+.dhcr-card__icon i {
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.dhcr-card__title {
+  text-align: center;
+  font-size: 1rem;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+@media (max-width: 1200px) {
+  .dhcr-dashboard__grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 250px));
+  }
+}
+
+@media (max-width: 767px) {
+  .dhcr-dashboard__title {
+    font-size: 1.5rem;
+  }
+
+  .dhcr-dashboard__greeting,
+  .dhcr-dashboard__stats,
+  .dhcr-dashboard__subline {
+    font-size: 1.15rem;
+  }
+
+  .dhcr-dashboard__section {
+    font-size: 2rem;
+  }
+
+  .dhcr-dashboard__grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 250px));
+  }
+
+  .dhcr-card {
+    min-height: 155px;
+  }
+
+  .dhcr-card__title {
+    font-size: 1rem;
+  }
+}

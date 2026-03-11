@@ -1,0 +1,217 @@
+<div class="dhcr-course-stats">
+  <div class="dhcr-course-stats__crumbs">
+    <a href="{{ path('dhcr_backend.dashboard') }}">{{ 'Dashboard'|t }}</a>
+    <span>/</span>
+    <a href="{{ path('dhcr_backend.statistics') }}">{{ 'Statistics'|t }}</a>
+    <span>/</span>
+    <span>{{ 'Course Statistics'|t }}</span>
+  </div>
+
+  <h2 class="dhcr-course-stats__heading"><i class="fas fa-graduation-cap" aria-hidden="true"></i> {{ 'Course Statistics'|t }}</h2>
+
+  <p class="dhcr-course-stats__updated"><u>{{ 'Data updated at:'|t }} {{ updated_at }}</u></p>
+
+  <h3 class="dhcr-course-stats__section-title"><i class="fas fa-star" aria-hidden="true"></i> {{ 'Key data'|t }}</h3>
+  <p class="dhcr-course-stats__key-data">
+    {{ 'Total:'|t }} {{ key_data.total }}<br>
+    {{ 'In admin area & published:'|t }} {{ key_data.admin_published }}<br>
+    <span class="dhcr-course-stats__value--red">{{ 'Needs to be updated:'|t }} {{ key_data.needs_update }}</span><br>
+    <span class="dhcr-course-stats__value--green">{{ 'Public visible:'|t }} {{ key_data.public_visible }}</span><br>
+    {{ 'Public as part of admin area:'|t }} {{ key_data.public_ratio }}<br>
+    {{ 'Active courses with original name field used:'|t }} {{ key_data.active_with_original_name }}
+  </p>
+
+  <h3 class="dhcr-course-stats__section-title"><i class="fas fa-flag" aria-hidden="true"></i> {{ 'Courses per country'|t }}</h3>
+  <div class="dhcr-course-stats__chart-wrap">
+    <div id="chart_course_counts_per_country" class="dhcr-course-stats__chart dhcr-course-stats__chart--wide"></div>
+  </div>
+  <table class="dhcr-course-stats__table">
+    <thead>
+      <tr>
+        <th>{{ 'Country'|t }}</th>
+        <th>{{ 'Number of courses'|t }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in country_counts_table %}
+        <tr>
+          <td>{{ row[0] }}</td>
+          <td>{{ row[1] }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h3 class="dhcr-course-stats__section-title"><i class="fas fa-book" aria-hidden="true"></i> {{ 'Courses per education type'|t }}</h3>
+  <div class="dhcr-course-stats__chart-wrap">
+    <div id="chart_course_counts_per_educ_type" class="dhcr-course-stats__chart"></div>
+  </div>
+  <table class="dhcr-course-stats__table">
+    <thead>
+      <tr>
+        <th>{{ 'Education type'|t }}</th>
+        <th>{{ 'Number of courses'|t }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in education_type_table %}
+        <tr>
+          <td>{{ row[0] }}</td>
+          <td>{{ row[1] }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h3 class="dhcr-course-stats__section-title"><i class="fas fa-plus" aria-hidden="true"></i> {{ 'New added courses in the last 1,5 year'|t }}</h3>
+  <p class="dhcr-course-stats__note"><i>{{ 'Includes not published or unpublished courses.'|t }}</i></p>
+  <div class="dhcr-course-stats__chart-wrap">
+    <div id="chart_new_courses" class="dhcr-course-stats__chart"></div>
+  </div>
+
+  <h3 class="dhcr-course-stats__section-title"><i class="fas fa-clock" aria-hidden="true"></i> {{ 'Outdated Courses - By country'|t }}</h3>
+  <table class="dhcr-course-stats__table">
+    <thead>
+      <tr>
+        <th>{{ 'Country'|t }}</th>
+        <th>{{ 'Number of courses'|t }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in outdated_by_country_table %}
+        <tr>
+          <td>{{ row[0] }}</td>
+          <td>{{ row[1] }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h3 class="dhcr-course-stats__section-title"><i class="fas fa-sliders-h" aria-hidden="true"></i> {{ 'Total updated courses until months ago'|t }}</h3>
+  <div class="dhcr-course-stats__chart-wrap">
+    <div id="chart_updated_courses" class="dhcr-course-stats__chart"></div>
+  </div>
+
+  <h3 class="dhcr-course-stats__section-title"><i class="fas fa-folder-open" aria-hidden="true"></i> {{ 'Amount of courses that will be archived soon'|t }}</h3>
+  <div class="dhcr-course-stats__chart-wrap">
+    <div id="chart_archived_soon_courses" class="dhcr-course-stats__chart"></div>
+  </div>
+
+  <h3 class="dhcr-course-stats__section-title"><i class="fas fa-list-alt" aria-hidden="true"></i> {{ 'New added courses - Top 25'|t }}</h3>
+  <p class="dhcr-course-stats__note"><i>{{ 'Sorted by date added, descending'|t }}</i></p>
+  <table class="dhcr-course-stats__table dhcr-course-stats__table--top">
+    <thead>
+      <tr>
+        <th>{{ 'ID'|t }}</th>
+        <th>{{ 'Created'|t }}</th>
+        <th>{{ 'Published'|t }}</th>
+        <th>{{ 'Course Name'|t }}</th>
+        <th>{{ 'Institution'|t }}</th>
+        <th>{{ 'Country'|t }}</th>
+        <th>{{ 'Course Owner'|t }}</th>
+        <th>{{ 'Approved'|t }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in new_courses_top %}
+        <tr>
+          <td>{{ row.id }}</td>
+          <td>{{ row.created }}</td>
+          <td>
+            {% if row.published %}
+              <strong class="dhcr-course-stats__value--green">{{ 'Yes'|t }}</strong>
+            {% else %}
+              <strong class="dhcr-course-stats__value--red">{{ 'No'|t }}</strong>
+            {% endif %}
+          </td>
+          <td><a href="{{ row.url }}">{{ row.title }}</a></td>
+          <td>{{ row.institution }}</td>
+          <td>{{ row.country }}</td>
+          <td>{{ row.owner }}</td>
+          <td>
+            {% if row.approved %}
+              <strong class="dhcr-course-stats__value--green">{{ 'Yes'|t }}</strong>
+            {% else %}
+              <strong class="dhcr-course-stats__value--red">{{ 'No'|t }}</strong>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p class="dhcr-course-stats__footer-note">
+    <i>{{ 'Note: All statistics can change at any time. For example when a user makes changes to a course or when a certain expiration period has exceeded.'|t }}</i>
+  </p>
+</div>
+
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+  (function () {
+    const updatedCoursesData = {{ chart_updated_courses|json_encode|raw }};
+    const archivedSoonData = {{ chart_archived_soon_courses|json_encode|raw }};
+    const newCoursesData = {{ chart_new_courses|json_encode|raw }};
+    const countryCountsData = {{ chart_course_counts_per_country|json_encode|raw }};
+    const educTypeData = {{ chart_course_counts_per_educ_type|json_encode|raw }};
+
+    if (!window.google || !google.charts) {
+      return;
+    }
+
+    google.charts.load('current', { packages: ['corechart', 'bar'] });
+    google.charts.setOnLoadCallback(drawChartUpdatedCourses);
+    google.charts.setOnLoadCallback(drawChartArchivedSoonCourses);
+    google.charts.setOnLoadCallback(drawChartNewCourses);
+    google.charts.setOnLoadCallback(drawChartCourseCountsPerCountry);
+    google.charts.setOnLoadCallback(drawChartCourseCountsPerEducType);
+
+    function drawChartUpdatedCourses() {
+      const data = google.visualization.arrayToDataTable(updatedCoursesData);
+      const options = {
+        hAxis: { title: 'Months ago' },
+        vAxis: { title: 'Total updated courses', maxValue: 299 },
+        legend: { position: 'none' }
+      };
+      new google.visualization.ColumnChart(document.getElementById('chart_updated_courses')).draw(data, options);
+    }
+
+    function drawChartArchivedSoonCourses() {
+      const data = google.visualization.arrayToDataTable(archivedSoonData);
+      const options = {
+        hAxis: { title: 'Months from now' },
+        vAxis: { title: 'Number of courses', minValue: 0 },
+        legend: { position: 'none' }
+      };
+      new google.visualization.ColumnChart(document.getElementById('chart_archived_soon_courses')).draw(data, options);
+    }
+
+    function drawChartNewCourses() {
+      const data = google.visualization.arrayToDataTable(newCoursesData);
+      const options = {
+        hAxis: { title: 'Months ago' },
+        vAxis: { title: 'New courses' },
+        legend: { position: 'none' }
+      };
+      new google.visualization.ColumnChart(document.getElementById('chart_new_courses')).draw(data, options);
+    }
+
+    function drawChartCourseCountsPerCountry() {
+      const data = google.visualization.arrayToDataTable(countryCountsData);
+      const options = {
+        height: 600,
+        width: 1600,
+        legend: { position: 'none' }
+      };
+      new google.visualization.ColumnChart(document.getElementById('chart_course_counts_per_country')).draw(data, options);
+    }
+
+    function drawChartCourseCountsPerEducType() {
+      const data = google.visualization.arrayToDataTable(educTypeData);
+      const options = {
+        height: 400,
+        legend: { position: 'none' }
+      };
+      new google.visualization.BarChart(document.getElementById('chart_course_counts_per_educ_type')).draw(data, options);
+    }
+  })();
+</script>

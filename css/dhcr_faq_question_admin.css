@@ -1,0 +1,87 @@
+.dhcr-faq-questions-list {
+  max-width: 1200px;
+}
+
+.dhcr-faq-questions-list__heading,
+.dhcr-faq-question-form__heading {
+  margin: 0 0 24px;
+  color: #1f73b5;
+  text-transform: uppercase;
+  font-size: 3rem;
+  font-weight: 800;
+}
+
+.dhcr-faq-questions-list__add,
+.dhcr-faq-question-form .button--dhcr-outline {
+  display: inline-block;
+  border: 4px solid #1f73b5;
+  color: #1f73b5;
+  border-radius: 999px;
+  background: transparent;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 1.6rem;
+  font-weight: 800;
+  padding: 12px 28px;
+  margin: 0 0 26px;
+}
+
+.dhcr-faq-questions-list__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.1rem;
+}
+
+.dhcr-faq-questions-list__table th {
+  color: #1f73b5;
+  text-align: left;
+  padding: 10px 12px;
+}
+
+.dhcr-faq-questions-list__table td {
+  color: #66707d;
+  padding: 10px 12px;
+  vertical-align: top;
+}
+
+.dhcr-faq-questions-list__table a {
+  color: #0068c9;
+  text-decoration: none;
+}
+
+.dhcr-faq-questions-list__table th.sortable a {
+  color: #1f73b5;
+  text-decoration: none;
+}
+
+.dhcr-faq-questions-list__table th.sortable.is-active a {
+  font-weight: 700;
+}
+
+.dhcr-faq-questions-list__table th.sortable.is-asc a::after {
+  content: " ^";
+  font-size: 0.9em;
+}
+
+.dhcr-faq-questions-list__table th.sortable.is-desc a::after {
+  content: " v";
+  font-size: 0.9em;
+}
+
+.dhcr-faq-question-form fieldset {
+  border: 2px solid #b3b8be;
+  margin: 0 0 24px;
+}
+
+.dhcr-faq-question-form label {
+  color: #1f73b5;
+  font-weight: 700;
+}
+
+.dhcr-faq-question-form input[type="text"],
+.dhcr-faq-question-form input[type="url"],
+.dhcr-faq-question-form textarea,
+.dhcr-faq-question-form select {
+  border: 2px solid #1f73b5;
+  border-radius: 9px;
+}

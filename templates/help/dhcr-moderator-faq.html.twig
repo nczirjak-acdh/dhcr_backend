@@ -1,0 +1,35 @@
+<div class="dhcr-faq-content">
+  <h2 class="dhcr-faq-content__heading">
+    <i class="fas fa-list-alt" aria-hidden="true"></i>
+    {{ 'Moderator FAQ'|t }}
+  </h2>
+  {% if edit_url %}
+    <p class="dhcr-faq-content__edit-link">
+      <a href="{{ edit_url }}">{{ 'Edit FAQ entries'|t }}</a>
+    </p>
+  {% endif %}
+
+  {% if items %}
+    <p class="dhcr-faq-content__contents-title"><strong><u>{{ 'Contents'|t }}</u></strong></p>
+    <ul class="dhcr-faq-content__contents-list">
+      {% for item in items %}
+        <li><a href="#question{{ item.id }}">{{ item.question }}</a></li>
+      {% endfor %}
+    </ul>
+
+    {% for item in items %}
+      <section class="dhcr-faq-content__item">
+        <h3 id="question{{ item.id }}">{{ item.question }}</h3>
+        <p>{{ item.answer|nl2br }}</p>
+        {% if item.link_url %}
+          <p>
+            {{ 'Link:'|t }}
+            <a href="{{ item.link_url }}">{{ item.link_title ?: item.link_url }}</a>
+          </p>
+        {% endif %}
+      </section>
+    {% endfor %}
+  {% else %}
+    <p>{{ 'No moderator FAQ entries are available.'|t }}</p>
+  {% endif %}
+</div>

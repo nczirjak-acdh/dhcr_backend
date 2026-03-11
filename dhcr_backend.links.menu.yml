@@ -1,0 +1,138 @@
+dhcr_backend.admin:
+  title: 'DHCR'
+  description: 'DHCR administration'
+  route_name: dhcr_backend.dashboard
+  parent: system.admin_content
+  weight: 50
+
+dhcr_backend.courses:
+  title: 'Courses'
+  route_name: entity.dhcr_course.collection
+  parent: dhcr_backend.admin
+  weight: 1
+
+dhcr_backend.courses_add:
+  title: 'Add course'
+  route_name: entity.dhcr_course.add_form
+  parent: dhcr_backend.courses
+  weight: 1
+
+dhcr_backend.expired_courses:
+  title: 'Expired courses'
+  route_name: dhcr_backend.expired_courses
+  parent: dhcr_backend.courses
+  weight: 2
+
+dhcr_backend.institutions:
+  title: 'Institutions'
+  route_name: entity.dhcr_institution.collection
+  parent: dhcr_backend.admin
+  weight: 2
+
+dhcr_backend.institutions_add:
+  title: 'Add institution'
+  route_name: entity.dhcr_institution.add_form
+  parent: dhcr_backend.institutions
+  weight: 1
+
+dhcr_backend.cities:
+  title: 'Cities'
+  route_name: entity.dhcr_city.collection
+  parent: dhcr_backend.admin
+  weight: 3
+
+dhcr_backend.cities_add:
+  title: 'Add city'
+  route_name: entity.dhcr_city.add_form
+  parent: dhcr_backend.cities
+  weight: 1
+
+dhcr_backend.countries:
+  title: 'Countries'
+  route_name: entity.dhcr_country.collection
+  parent: dhcr_backend.admin
+  weight: 4
+
+dhcr_backend.countries_add:
+  title: 'Add country'
+  route_name: entity.dhcr_country.add_form
+  parent: dhcr_backend.countries
+  weight: 1
+
+dhcr_backend.languages:
+  title: 'Languages'
+  route_name: entity.dhcr_language.collection
+  parent: dhcr_backend.admin
+  weight: 5
+
+dhcr_backend.translations:
+  title: 'Translations'
+  route_name: entity.dhcr_invite_translation.collection
+  parent: dhcr_backend.admin
+  weight: 5
+
+dhcr_backend.translations_add:
+  title: 'Add translation'
+  route_name: entity.dhcr_invite_translation.add_form
+  parent: dhcr_backend.translations
+  weight: 1
+
+dhcr_backend.languages_add:
+  title: 'Add language'
+  route_name: entity.dhcr_language.add_form
+  parent: dhcr_backend.languages
+  weight: 1
+
+dhcr_backend.course_types:
+  title: 'Course types'
+  route_name: entity.dhcr_course_type.collection
+  parent: dhcr_backend.admin
+  weight: 6
+
+dhcr_backend.course_types_add:
+  title: 'Add course type'
+  route_name: entity.dhcr_course_type.add_form
+  parent: dhcr_backend.course_types
+  weight: 1
+
+dhcr_backend.duration_units:
+  title: 'Duration units'
+  route_name: entity.dhcr_duration_unit.collection
+  parent: dhcr_backend.admin
+  weight: 7
+
+dhcr_backend.duration_units_add:
+  title: 'Add duration unit'
+  route_name: entity.dhcr_duration_unit.add_form
+  parent: dhcr_backend.duration_units
+  weight: 1
+
+dhcr_backend.statistics:
+  title: 'Statistics'
+  route_name: dhcr_backend.statistics
+  parent: dhcr_backend.admin
+  weight: 8
+
+dhcr_backend.statistics_summary:
+  title: 'Summary statistics'
+  route_name: dhcr_backend.statistics_summary
+  parent: dhcr_backend.statistics
+  weight: 1
+
+dhcr_backend.statistics_courses:
+  title: 'Course statistics'
+  route_name: dhcr_backend.statistics_courses
+  parent: dhcr_backend.statistics
+  weight: 2
+
+dhcr_backend.statistics_users:
+  title: 'User statistics'
+  route_name: dhcr_backend.statistics_users
+  parent: dhcr_backend.statistics
+  weight: 3
+
+dhcr_backend.statistics_app_info:
+  title: 'App info'
+  route_name: dhcr_backend.statistics_app_info
+  parent: dhcr_backend.statistics
+  weight: 4

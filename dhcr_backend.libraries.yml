@@ -1,0 +1,148 @@
+admin_base:
+  version: 1.x
+  css:
+    theme:
+      css/dhcr_admin_base.css: {}
+
+fontawesome_free:
+  version: 5.15.4
+  remote: https://fontawesome.com
+  license:
+    name: 'Font Awesome Free License'
+    url: 'https://fontawesome.com/license/free'
+    gpl-compatible: false
+  css:
+    theme:
+      https://use.fontawesome.com/releases/v5.15.4/css/all.css: { type: external, minified: true }
+
+admin_table_search:
+  version: 1.x
+  js:
+    js/dhcr_admin_table_search.js: {}
+  css:
+    theme:
+      css/dhcr_admin_table_search.css: {}
+  dependencies:
+    - core/drupal
+    - core/once
+
+course_form:
+  version: 1.x
+  remote: https://api.mapbox.com
+  license:
+    name: 'Mapbox Terms of Service'
+    url: 'https://www.mapbox.com/legal/tos'
+    gpl-compatible: false
+  js:
+    https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js: { type: external, minified: true }
+    js/dhcr_course_form.js: {}
+  css:
+    theme:
+      https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css: { type: external, minified: true }
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+
+institution_form_map:
+  version: 1.x
+  js:
+    js/dhcr_institution_form.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+
+admin_dashboard:
+  version: 1.x
+  css:
+    theme:
+      css/dhcr_dashboard.css: {}
+
+admin_help:
+  version: 1.x
+  css:
+    theme:
+      css/dhcr_help.css: {}
+
+admin_courses:
+  version: 1.x
+  css:
+    theme:
+      css/dhcr_courses_admin.css: {}
+
+admin_needs_attention:
+  version: 1.x
+  css:
+    theme:
+      css/dhcr_needs_attention.css: {}
+
+admin_contributor_network:
+  version: 1.x
+  css:
+    theme:
+      css/dhcr_contributor_network.css: {}
+
+admin_user_edit:
+  version: 1.x
+  css:
+    theme:
+      css/dhcr_user_edit_admin.css: {}
+
+admin_statistics:
+  version: 1.x
+  css:
+    theme:
+      css/dhcr_statistics.css: {}
+
+admin_all_courses:
+  version: 1.x
+  css:
+    theme:
+      css/dhcr_all_courses.css: {}
+
+admin_category_lists:
+  version: 1.x
+  css:
+    theme:
+      css/dhcr_category_lists.css: {}
+
+admin_city:
+  version: 1.x
+  css:
+    theme:
+      css/dhcr_city_admin.css: {}
+
+admin_institution:
+  version: 1.x
+  css:
+    theme:
+      css/dhcr_institution_admin.css: {}
+
+admin_language:
+  version: 1.x
+  css:
+    theme:
+      css/dhcr_language_admin.css: {}
+
+admin_translation:
+  version: 1.x
+  css:
+    theme:
+      css/dhcr_translation_admin.css: {}
+
+admin_country:
+  version: 1.x
+  css:
+    theme:
+      css/dhcr_country_admin.css: {}
+
+admin_external_resource:
+  version: 1.x
+  css:
+    theme:
+      css/dhcr_external_resource_admin.css: {}
+
+admin_faq_question:
+  version: 1.x
+  css:
+    theme:
+      css/dhcr_faq_question_admin.css: {}

@@ -1,0 +1,15 @@
+name: DHCR Backend
+type: module
+description: 'DHCR domain entities, master data, workflows, cron jobs, permissions.'
+package: DHCR
+core_version_requirement: ^11
+dependencies:
+  - drupal:user
+  - drupal:system
+  - drupal:field
+  - drupal:text
+  - drupal:datetime
+  - drupal:options
+  - drupal:link
+  - drupal:views
+  - dhcr_logs:dhcr_logs

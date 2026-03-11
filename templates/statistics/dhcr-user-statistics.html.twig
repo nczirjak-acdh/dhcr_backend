@@ -1,0 +1,106 @@
+<div class="dhcr-user-stats">
+  <div class="dhcr-user-stats__crumbs">
+    <a href="{{ path('dhcr_backend.dashboard') }}">{{ 'Dashboard'|t }}</a>
+    <span>/</span>
+    <a href="{{ path('dhcr_backend.statistics') }}">{{ 'Statistics'|t }}</a>
+    <span>/</span>
+    <span>{{ 'User Statistics'|t }}</span>
+  </div>
+
+  <h2 class="dhcr-user-stats__heading"><i class="fas fa-user" aria-hidden="true"></i> {{ 'User Statistics'|t }}</h2>
+
+  <p class="dhcr-user-stats__updated"><u>{{ 'Data updated at:'|t }} {{ updated_at }}</u></p>
+
+  <h3 class="dhcr-user-stats__section-title"><i class="fas fa-star" aria-hidden="true"></i> {{ 'Key data'|t }}</h3>
+  <p class="dhcr-user-stats__key-data">
+    {{ 'Total:'|t }} {{ key_data.total }}<br>
+    {{ 'Total available*:'|t }} {{ key_data.available }}<br>
+    <br>
+    {{ 'Preference for mailing list:'|t }} {{ key_data.mailing_preference }} {{ '(includes not activated and not approved accounts)'|t }}<br>
+    {{ 'Subcribed to mailing list:'|t }} {{ key_data.mailing_subscribed }}<br>
+    {{ 'Available & subcribed as part of available:'|t }} {{ key_data.available_subscribed_ratio }}<br>
+    <br>
+    {{ 'Moderators:'|t }} {{ key_data.moderators }}<br>
+    {{ 'Moderators subscribed to mailing list:'|t }} {{ key_data.moderators_subscribed }}<br>
+    <br>
+    {{ 'Administrators:'|t }} {{ key_data.administrators }}<br>
+    {{ 'Administrators shown on contact page:'|t }} {{ key_data.contact_admins }}
+  </p>
+
+  <h3 class="dhcr-user-stats__section-title"><i class="fas fa-user" aria-hidden="true"></i> {{ 'Logged in users until months ago'|t }}</h3>
+  <div class="dhcr-user-stats__chart-wrap">
+    <div id="chart_users" class="dhcr-user-stats__chart"></div>
+  </div>
+
+  <h3 class="dhcr-user-stats__section-title"><i class="fas fa-th-list" aria-hidden="true"></i> {{ 'Logged in moderators until months ago'|t }}</h3>
+  <div class="dhcr-user-stats__chart-wrap">
+    <div id="chart_moderators" class="dhcr-user-stats__chart"></div>
+  </div>
+
+  <h3 class="dhcr-user-stats__section-title"><i class="fas fa-sliders-h" aria-hidden="true"></i> {{ 'Moderator participation'|t }}</h3>
+  <h4 class="dhcr-user-stats__subheading">{{ 'Amount of moderators that logged in within the last 4 months'|t }}</h4>
+
+  <table class="dhcr-user-stats__legend-table">
+    <tbody>
+      <tr>
+        <td class="dhcr-user-stats__legend-icon-cell">
+          <div class="dhcr-user-stats__traffic-light" aria-hidden="true">
+            <i class="fas fa-traffic-light"></i>
+          </div>
+        </td>
+        <td>
+          {{ 'Green: More than 70%'|t }}<br>
+          {{ 'Yellow: More than 50%'|t }}<br>
+          {{ 'Red: 50% or less'|t }}<br>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr>
+
+  <p class="dhcr-user-stats__note">{{ '*Available users meet the following criteria:'|t }}</p>
+  <ol class="dhcr-user-stats__criteria">
+    <li>{{ 'Email verified'|t }}</li>
+    <li>{{ 'Password set'|t }}</li>
+    <li>{{ 'Approved (by moderator)'|t }}</li>
+    <li>{{ 'Account not disabled'|t }}</li>
+  </ol>
+  <p class="dhcr-user-stats__footer-note"><i>{{ 'Note: These statistics can change at any time.'|t }}</i></p>
+</div>
+
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+  (function () {
+    const usersData = {{ chart_users|json_encode|raw }};
+    const moderatorsData = {{ chart_moderators|json_encode|raw }};
+
+    if (!window.google || !google.charts) {
+      return;
+    }
+
+    google.charts.load('current', { packages: ['corechart', 'bar'] });
+    google.charts.setOnLoadCallback(drawChartUsers);
+    google.charts.setOnLoadCallback(drawChartModerators);
+
+    function drawChartUsers() {
+      const data = google.visualization.arrayToDataTable(usersData);
+      const options = {
+        hAxis: { title: 'Until months ago' },
+        vAxis: { title: 'Logged in users', maxValue: 511 },
+        legend: { position: 'none' }
+      };
+      new google.visualization.ColumnChart(document.getElementById('chart_users')).draw(data, options);
+    }
+
+    function drawChartModerators() {
+      const data = google.visualization.arrayToDataTable(moderatorsData);
+      const options = {
+        hAxis: { title: 'Until months ago' },
+        vAxis: { title: 'Logged in moderators', maxValue: 26 },
+        legend: { position: 'none' }
+      };
+      new google.visualization.ColumnChart(document.getElementById('chart_moderators')).draw(data, options);
+    }
+  })();
+</script>

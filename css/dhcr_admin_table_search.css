@@ -1,0 +1,108 @@
+.dhcr-table-search {
+  margin: 0 0 18px;
+}
+
+.dhcr-table-search__input {
+  appearance: none;
+  background: #fff;
+  border: 2px solid #1f73b5;
+  border-radius: 999px;
+  color: #1f2937;
+  font: 500 16px/1.2 "Avenir Next", "Trebuchet MS", sans-serif;
+  height: 40px;
+  max-width: 420px;
+  padding: 0 16px;
+  width: 100%;
+}
+
+.dhcr-table-search__input:focus {
+  border-color: #185d93;
+  outline: none;
+}
+
+.dhcr-table-search__empty-row td {
+  color: #6b7280;
+  font-style: italic;
+  padding: 14px 0;
+}
+
+.dhcr-table-pager {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+
+.dhcr-table-pager--top {
+  margin: 0 0 12px;
+}
+
+.dhcr-table-pager__left {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.dhcr-table-pager__count {
+  color: #4b5563;
+  font: 500 18px/1.35 "Avenir Next", "Trebuchet MS", sans-serif;
+}
+
+.dhcr-table-pager__pagesize {
+  align-items: center;
+  color: #4b5563;
+  display: inline-flex;
+  font: 600 14px/1 "Avenir Next", "Trebuchet MS", sans-serif;
+  gap: 8px;
+}
+
+.dhcr-table-pager__select {
+  appearance: none;
+  background: #fff;
+  border: 2px solid #1f73b5;
+  border-radius: 999px;
+  color: #1f73b5;
+  cursor: pointer;
+  font: 700 14px/1 "Avenir Next", "Trebuchet MS", sans-serif;
+  height: 34px;
+  min-width: 88px;
+  padding: 0 12px;
+}
+
+.dhcr-table-pager__select:focus {
+  border-color: #185d93;
+  outline: none;
+}
+
+.dhcr-table-pager__nav {
+  display: flex;
+  gap: 8px;
+}
+
+.dhcr-table-pager__button {
+  appearance: none;
+  background: #fff;
+  border: 2px solid #1f73b5;
+  border-radius: 999px;
+  color: #1f73b5;
+  cursor: pointer;
+  font: 700 15px/1 "Avenir Next", "Trebuchet MS", sans-serif;
+  min-height: 34px;
+  padding: 0 14px;
+}
+
+.dhcr-table-pager__button:hover,
+.dhcr-table-pager__button:focus {
+  border-color: #185d93;
+  color: #185d93;
+  outline: none;
+}
+
+.dhcr-table-pager__button:disabled {
+  border-color: #c7d2e0;
+  color: #9ca3af;
+  cursor: default;
+}

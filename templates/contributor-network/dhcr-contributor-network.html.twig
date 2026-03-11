@@ -1,0 +1,15 @@
+<div class="dhcr-contributor-network">
+  <h2 class="dhcr-contributor-network__heading">{{ 'Contributor Network'|t }}</h2>
+
+  <div class="dhcr-contributor-network__grid">
+    {% for card in cards %}
+      <a class="dhcr-contributor-card" href="{{ card.url }}">
+        <div class="dhcr-contributor-card__icon" aria-hidden="true"><i class="{{ card.icon }}"></i></div>
+        <div class="dhcr-contributor-card__title">{{ card.title }}</div>
+        {% if card.count is not null %}
+          <div class="dhcr-contributor-card__count">[ {{ card.count }} ]</div>
+        {% endif %}
+      </a>
+    {% endfor %}
+  </div>
+</div>

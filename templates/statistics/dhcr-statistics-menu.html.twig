@@ -1,0 +1,12 @@
+<div class="dhcr-statistics">
+  <h2 class="dhcr-statistics__heading"><i class="fas fa-chart-bar" aria-hidden="true"></i> {{ 'Statistics'|t }}</h2>
+
+  <div class="dhcr-statistics__grid">
+    {% for card in cards %}
+      <a class="dhcr-statistics-card" href="{{ card.url }}">
+        <div class="dhcr-statistics-card__icon" aria-hidden="true"><i class="{{ card.icon }}"></i></div>
+        <div class="dhcr-statistics-card__title">{{ card.title }}</div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
