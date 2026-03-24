@@ -12,12 +12,13 @@ use Drupal\Core\Session\AccountInterface;
 class DhcrGenericAccessControlHandler extends EntityAccessControlHandler {
 
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account): AccessResult {
-    // Simple rule: only admins can manage master-data entities.
-    return AccessResult::allowedIfHasPermission($account, 'administer dhcr backend');
+    $permission = $this->entityType->getAdminPermission() ?: 'administer dhcr backend';
+    return AccessResult::allowedIfHasPermission($account, $permission);
   }
 
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL): AccessResult {
-    return AccessResult::allowedIfHasPermission($account, 'administer dhcr backend');
+    $permission = $this->entityType->getAdminPermission() ?: 'administer dhcr backend';
+    return AccessResult::allowedIfHasPermission($account, $permission);
   }
 
 }

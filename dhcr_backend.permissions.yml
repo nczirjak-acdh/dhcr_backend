@@ -1,3 +1,7 @@
-administer dhcr backend:
-  title: 'Administer DHCR backend'
-  description: 'Full administrative access to DHCR backend entities and workflows.'
+administer_dhcr_backend:
+  title: 'Access DHCR moderator backend'
+  description: 'Access moderator-level DHCR backend workflows (course/user moderation and country-level curation).'
+
+administer_dhcr_global_settings:
+  title: 'Administer DHCR global settings'
+  description: 'Access administrator-only DHCR global tools (countries, languages, translations, FAQs, statistics, moderator management).'

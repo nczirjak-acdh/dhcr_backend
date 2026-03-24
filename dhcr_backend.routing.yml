@@ -4,7 +4,7 @@ dhcr_backend.dashboard:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrDashboardController::dashboard'
     _title: 'Dashboard'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_backend'
 
 dhcr_backend.courses_admin:
   path: '/admin/content/dhcr/courses-admin'
@@ -12,7 +12,7 @@ dhcr_backend.courses_admin:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrDashboardController::coursesAdmin'
     _title: 'Administrate Courses'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_backend'
 
 dhcr_backend.category_lists:
   path: '/admin/content/dhcr/category-lists'
@@ -20,7 +20,7 @@ dhcr_backend.category_lists:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrDashboardController::categoryLists'
     _title: 'Category Lists'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_global_settings'
 
 dhcr_backend.help:
   path: '/admin/content/dhcr/help'
@@ -28,7 +28,7 @@ dhcr_backend.help:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrDashboardController::help'
     _title: 'Help'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_backend'
 
 dhcr_backend.help_moderator_faq:
   path: '/admin/content/dhcr/help/moderator-faq'
@@ -36,7 +36,7 @@ dhcr_backend.help_moderator_faq:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrDashboardController::moderatorFaq'
     _title: 'Moderator FAQ'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_backend'
 
 dhcr_backend.contributor_network:
   path: '/admin/content/dhcr/contributor-network'
@@ -44,7 +44,7 @@ dhcr_backend.contributor_network:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrContributorController::contributorNetwork'
     _title: 'Contributor Network'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_backend'
 
 dhcr_backend.all_users:
   path: '/admin/content/dhcr/contributor-network/users'
@@ -52,7 +52,7 @@ dhcr_backend.all_users:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrContributorController::allUsers'
     _title: 'All Users'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_backend'
 
 dhcr_backend.pending_invitations:
   path: '/admin/content/dhcr/contributor-network/pending-invitations'
@@ -60,7 +60,7 @@ dhcr_backend.pending_invitations:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrContributorController::pendingInvitations'
     _title: 'Pending Invitations'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_backend'
 
 dhcr_backend.moderators:
   path: '/admin/content/dhcr/contributor-network/moderators'
@@ -68,7 +68,7 @@ dhcr_backend.moderators:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrContributorController::moderators'
     _title: 'Moderators'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_global_settings'
 
 dhcr_backend.user_edit:
   path: '/admin/content/dhcr/contributor-network/users/{user}/edit'
@@ -76,7 +76,7 @@ dhcr_backend.user_edit:
     _form: '\Drupal\dhcr_backend\Form\DhcrUserEditForm'
     _title: 'Edit User'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_backend'
 
 dhcr_backend.statistics:
   path: '/admin/content/dhcr/statistics'
@@ -84,7 +84,7 @@ dhcr_backend.statistics:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrStatisticsController::statisticsMenu'
     _title: 'Statistics'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_global_settings'
 
 dhcr_backend.statistics_summary:
   path: '/admin/content/dhcr/statistics/summary'
@@ -92,7 +92,7 @@ dhcr_backend.statistics_summary:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrStatisticsController::summaryStatistics'
     _title: 'Summary Statistics'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_global_settings'
 
 dhcr_backend.statistics_courses:
   path: '/admin/content/dhcr/statistics/courses'
@@ -100,7 +100,7 @@ dhcr_backend.statistics_courses:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrStatisticsController::courseStatistics'
     _title: 'Course Statistics'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_global_settings'
 
 dhcr_backend.statistics_users:
   path: '/admin/content/dhcr/statistics/users'
@@ -108,7 +108,7 @@ dhcr_backend.statistics_users:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrStatisticsController::userStatistics'
     _title: 'User Statistics'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_global_settings'
 
 dhcr_backend.statistics_app_info:
   path: '/admin/content/dhcr/statistics/app-info'
@@ -116,7 +116,7 @@ dhcr_backend.statistics_app_info:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrStatisticsController::appInfo'
     _title: 'App Info'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_global_settings'
 
 dhcr_backend.reinvite_user:
   path: '/admin/content/dhcr/contributor-network/invitations/{dhcr_user_invitation}/reinvite'
@@ -124,7 +124,7 @@ dhcr_backend.reinvite_user:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrContributorController::reinviteUser'
     _title: 'Reinvite User'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_backend'
 
 dhcr_backend.needs_attention:
   path: '/admin/content/dhcr/needs-attention'
@@ -132,7 +132,7 @@ dhcr_backend.needs_attention:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrDashboardController::needsAttention'
     _title: 'Needs Attention'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_backend'
 
 dhcr_backend.account_approval:
   path: '/admin/content/dhcr/needs-attention/account-approval'
@@ -140,7 +140,7 @@ dhcr_backend.account_approval:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrDashboardController::accountApproval'
     _title: 'Account Approval'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_backend'
 
 dhcr_backend.course_approval:
   path: '/admin/content/dhcr/needs-attention/course-approval'
@@ -148,7 +148,7 @@ dhcr_backend.course_approval:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrDashboardController::courseApproval'
     _title: 'Course Approval'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_backend'
 
 dhcr_backend.course_expiry:
   path: '/admin/content/dhcr/needs-attention/course-expiry'
@@ -156,7 +156,15 @@ dhcr_backend.course_expiry:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrDashboardController::courseExpiry'
     _title: 'Course Expiry'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_backend'
+
+dhcr_backend.course_transfer:
+  path: '/admin/content/dhcr/courses/{dhcr_course}/transfer'
+  defaults:
+    _form: '\Drupal\dhcr_backend\Form\DhcrCourseTransferForm'
+    _title: 'Transfer Course'
+  requirements:
+    _permission: 'administer_dhcr_backend'
 
 dhcr_backend.expired_courses:
   path: '/admin/content/dhcr/expired-courses'
@@ -164,4 +172,4 @@ dhcr_backend.expired_courses:
     _controller: '\Drupal\dhcr_backend\Controller\DhcrDashboardController::expiredCourses'
     _title: 'Expired Courses'
   requirements:
-    _permission: 'administer dhcr backend'
+    _permission: 'administer_dhcr_backend'

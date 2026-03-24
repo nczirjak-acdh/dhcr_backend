@@ -123,7 +123,7 @@ final class DhcrCourseListBuilder extends EntityListBuilder {
       ],
       [
         'label' => (string) $this->t('Transfer'),
-        'url' => $entity->toUrl('edit-form', ['query' => ['action' => 'transfer']])->toString(),
+        'url' => Url::fromRoute('dhcr_backend.course_transfer', ['dhcr_course' => (int) $entity->id()])->toString(),
       ],
     ];
 

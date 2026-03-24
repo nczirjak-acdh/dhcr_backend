@@ -31,13 +31,16 @@ final class DhcrContributorController extends ControllerBase {
         'count' => $this->countInvitations(),
         'url' => Url::fromRoute('dhcr_backend.pending_invitations')->toString(),
       ],
-      [
+    ];
+
+    if ($this->currentUser()->hasPermission('administer dhcr global settings')) {
+      $cards[] = [
         'title' => (string) $this->t('Moderators'),
         'icon' => 'fas fa-asterisk',
         'count' => $this->countProfiles(['moderator' => 1]),
         'url' => Url::fromRoute('dhcr_backend.moderators')->toString(),
-      ],
-    ];
+      ];
+    }
 
     return [
       '#theme' => 'dhcr_contributor_network',

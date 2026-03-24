@@ -15,9 +15,11 @@ final class DhcrDashboardController extends ControllerBase {
   public function dashboard(): array {
     $current_user = $this->currentUser();
     $display_name = $current_user->getDisplayName();
-    $role_text = $current_user->hasPermission('administer dhcr backend')
+    $is_global_admin = $current_user->hasPermission('administer dhcr global settings');
+    $is_moderator_backend = $current_user->hasPermission('administer dhcr backend');
+    $role_text = $is_global_admin
       ? (string) $this->t('administrator')
-      : (string) $this->t('contributor');
+      : ($is_moderator_backend ? (string) $this->t('national moderator') : (string) $this->t('contributor'));
 
     $pending_approval = $this->countPendingCourses();
     $expiry_candidates = $this->countCourseExpiryCandidates();
@@ -39,16 +41,6 @@ final class DhcrDashboardController extends ControllerBase {
         'url' => $this->routeOrFallback('dhcr_backend.contributor_network'),
       ],
       [
-        'title' => (string) $this->t('Statistics'),
-        'icon' => 'fas fa-chart-bar',
-        'url' => $this->routeOrFallback('dhcr_backend.statistics'),
-      ],
-      [
-        'title' => (string) $this->t('Category Lists'),
-        'icon' => 'fas fa-list',
-        'url' => $this->routeOrFallback('dhcr_backend.category_lists'),
-      ],
-      [
         'title' => (string) $this->t('Profile Settings'),
         'icon' => 'fas fa-cog',
         'url' => $this->routeOrFallback('entity.user.edit_form', ['user' => $current_user->id()]),
@@ -59,6 +51,19 @@ final class DhcrDashboardController extends ControllerBase {
         'url' => $this->routeOrFallback('dhcr_backend.help'),
       ],
     ];
+
+    if ($is_global_admin) {
+      $cards[] = [
+        'title' => (string) $this->t('Statistics'),
+        'icon' => 'fas fa-chart-bar',
+        'url' => $this->routeOrFallback('dhcr_backend.statistics'),
+      ];
+      $cards[] = [
+        'title' => (string) $this->t('Category Lists'),
+        'icon' => 'fas fa-list',
+        'url' => $this->routeOrFallback('dhcr_backend.category_lists'),
+      ];
+    }
 
     return [
       '#theme' => 'dhcr_dashboard',
@@ -81,6 +86,7 @@ final class DhcrDashboardController extends ControllerBase {
 
   public function coursesAdmin(): array {
     $current_user = $this->currentUser();
+    $is_global_admin = $current_user->hasPermission('administer dhcr global settings');
     $all_courses = $this->countAdminVisibleCourses();
     $my_courses = $this->countCourses(['uid' => (int) $current_user->id()]);
     $external_resources = $this->countEntities('dhcr_external_resource');
@@ -104,13 +110,16 @@ final class DhcrDashboardController extends ControllerBase {
         'count' => $my_courses,
         'url' => $this->routeOrFallback('entity.dhcr_course.collection'),
       ],
-      [
+    ];
+
+    if ($is_global_admin) {
+      $cards[] = [
         'title' => (string) $this->t('External Resources'),
         'icon' => 'fas fa-th-list',
         'count' => $external_resources,
         'url' => $this->routeOrFallback('entity.dhcr_external_resource.collection'),
-      ],
-    ];
+      ];
+    }
 
     return [
       '#theme' => 'dhcr_courses_admin',
@@ -187,11 +196,6 @@ final class DhcrDashboardController extends ControllerBase {
   public function help(): array {
     $cards = [
       [
-        'title' => (string) $this->t('Contributor FAQ'),
-        'icon' => 'fas fa-graduation-cap',
-        'url' => $this->routeOrFallback('entity.dhcr_faq_question.collection'),
-      ],
-      [
         'title' => (string) $this->t('Users, Access and Workflows'),
         'icon' => 'fas fa-wrench',
         'url' => $this->routeOrFallback('dhcr_backend.all_users'),
@@ -202,6 +206,14 @@ final class DhcrDashboardController extends ControllerBase {
         'url' => $this->routeOrFallback('dhcr_backend.help_moderator_faq'),
       ],
     ];
+
+    if ($this->currentUser()->hasPermission('administer dhcr global settings')) {
+      array_unshift($cards, [
+        'title' => (string) $this->t('Contributor FAQ'),
+        'icon' => 'fas fa-graduation-cap',
+        'url' => $this->routeOrFallback('entity.dhcr_faq_question.collection'),
+      ]);
+    }
 
     return [
       '#theme' => 'dhcr_help',

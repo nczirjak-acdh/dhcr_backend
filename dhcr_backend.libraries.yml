@@ -13,7 +13,7 @@ fontawesome_free:
     gpl-compatible: false
   css:
     theme:
-      https://use.fontawesome.com/releases/v5.15.4/css/all.css: { type: external, minified: true }
+      https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css: { type: external, minified: true }
 
 admin_table_search:
   version: 1.x
