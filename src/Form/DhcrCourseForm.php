@@ -9,6 +9,25 @@ use Drupal\dhcr_backend\Utility\DhcrMapConfig;
 
 final class DhcrCourseForm extends DhcrContentEntityForm {
 
+  private const START_DATE_ELEMENT = 'dhcr_start_date_calendar';
+
+  private const MULTI_SELECT_FIELDS = [
+    'disciplines' => [
+      'element' => 'dhcr_disciplines_select',
+      'label' => 'Disciplines',
+    ],
+    'tadirah_techniques' => [
+      'element' => 'dhcr_tadirah_techniques_select',
+      'label' => 'TaDiRAH Techniques',
+    ],
+    'tadirah_objects' => [
+      'element' => 'dhcr_tadirah_objects_select',
+      'label' => 'TaDiRAH Objects',
+    ],
+  ];
+
+  private array $multiSelectOptions = [];
+
   public function form(array $form, FormStateInterface $form_state): array {
     $form = parent::form($form, $form_state);
 
@@ -51,11 +70,8 @@ final class DhcrCourseForm extends DhcrContentEntityForm {
       $form['access_requirements']['widget'][0]['value']['#placeholder'] = $this->t('For instance: if you want to enroll in this MA module, you need to hold a BA degree in X, Y, Z');
     }
 
-    if (isset($form['start_dates']['widget'][0]['value'])) {
-      $form['start_dates']['widget'][0]['value']['#title'] = $this->t('Start Date*');
-      $form['start_dates']['widget'][0]['value']['#placeholder'] = $this->t('YYYY-MM-DD or multiple dates separated by semicolon');
-      $form['start_dates']['#description'] = $this->t('At least one valid date in the format YYYY-MM-DD is needed. You can enter multiple dates separated by semicolon. Example: 2024-03-15;2024-06-15.');
-    }
+    $this->addStartDateCalendar($form);
+
     if (isset($form['start_date'])) {
       $form['start_date']['#access'] = FALSE;
     }
@@ -71,17 +87,7 @@ final class DhcrCourseForm extends DhcrContentEntityForm {
       $form['institution']['#description'] = $this->t('If your institution is not listed, please contact your national moderator.');
     }
 
-    if (isset($form['disciplines']['widget'][0]['value'])) {
-      $form['disciplines']['widget'][0]['value']['#description'] = $this->t('Add one or more disciplines, separated by comma.');
-    }
-
-    if (isset($form['tadirah_techniques']['widget'][0]['value'])) {
-      $form['tadirah_techniques']['widget'][0]['value']['#description'] = $this->t('Add one or more TaDiRAH techniques, separated by comma.');
-    }
-
-    if (isset($form['tadirah_objects']['widget'][0]['value'])) {
-      $form['tadirah_objects']['widget'][0]['value']['#description'] = $this->t('Add one or more TaDiRAH objects, separated by comma.');
-    }
+    $this->addMetadataMultiSelects($form);
 
     if (isset($form['lon']['widget'][0]['value'])) {
       $form['lon']['widget'][0]['value']['#type'] = 'hidden';
@@ -123,6 +129,33 @@ final class DhcrCourseForm extends DhcrContentEntityForm {
     return $form;
   }
 
+  public function afterBuild(array $element, FormStateInterface $form_state) {
+    if ($form_state->isProcessingInput()) {
+      $this->syncStartDateCalendarValue($form_state);
+      $this->syncMetadataMultiSelectValues($form_state);
+    }
+
+    return parent::afterBuild($element, $form_state);
+  }
+
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    $this->syncStartDateCalendarValue($form_state);
+    $this->syncMetadataMultiSelectValues($form_state);
+    return parent::validateForm($form, $form_state);
+  }
+
+  public function buildEntity(array $form, FormStateInterface $form_state) {
+    $this->syncStartDateCalendarValue($form_state);
+    $entity = parent::buildEntity($form, $form_state);
+
+    $date = $this->normalizeDateValue((string) ($form_state->getValue(self::START_DATE_ELEMENT) ?? ''));
+    if ($entity->hasField('start_date')) {
+      $entity->set('start_date', $date !== '' ? $date : NULL);
+    }
+
+    return $entity;
+  }
+
   protected function actions(array $form, FormStateInterface $form_state): array {
     $actions = parent::actions($form, $form_state);
     $actions['submit']['#value'] = $this->t('Add Course');
@@ -152,6 +185,153 @@ final class DhcrCourseForm extends DhcrContentEntityForm {
     }
 
     return $status;
+  }
+
+  private function addMetadataMultiSelects(array &$form): void {
+    foreach (self::MULTI_SELECT_FIELDS as $field_name => $settings) {
+      if (!isset($form[$field_name])) {
+        continue;
+      }
+
+      $selected = $this->splitMetadataValues((string) ($this->getEntity()->get($field_name)->value ?? ''));
+      $weight = (int) ($form[$field_name]['#weight'] ?? $form[$field_name]['widget']['#weight'] ?? 0);
+      $form[$field_name]['#access'] = FALSE;
+
+      $form[$settings['element']] = [
+        '#type' => 'select',
+        '#title' => $this->t($settings['label']),
+        '#options' => $this->getMetadataOptions($field_name, $selected),
+        '#default_value' => $selected,
+        '#multiple' => TRUE,
+        '#size' => 7,
+        '#required' => TRUE,
+        '#description' => $this->t('You can select more than one item.'),
+        '#weight' => $weight,
+        '#attributes' => [
+          'class' => ['dhcr-course-metadata-select'],
+        ],
+      ];
+    }
+  }
+
+  private function addStartDateCalendar(array &$form): void {
+    if (!isset($form['start_dates'])) {
+      return;
+    }
+
+    $weight = (int) ($form['start_dates']['#weight'] ?? $form['start_dates']['widget']['#weight'] ?? 0);
+    $form['start_dates']['#access'] = FALSE;
+
+    $form[self::START_DATE_ELEMENT] = [
+      '#type' => 'date',
+      '#title' => $this->t('Start Date*'),
+      '#default_value' => $this->extractFirstDate((string) ($this->getEntity()->get('start_dates')->value ?? '')),
+      '#required' => TRUE,
+      '#description' => $this->t('Choose the course start date.'),
+      '#weight' => $weight,
+      '#attributes' => [
+        'class' => ['dhcr-course-start-date'],
+      ],
+    ];
+  }
+
+  private function syncStartDateCalendarValue(FormStateInterface $form_state): void {
+    $date = $this->normalizeDateValue((string) ($form_state->getValue(self::START_DATE_ELEMENT) ?? ''));
+    $form_state->setValue('start_dates', [
+      [
+        'value' => $date,
+        '_weight' => 0,
+      ],
+    ]);
+  }
+
+  private function syncMetadataMultiSelectValues(FormStateInterface $form_state): void {
+    foreach (self::MULTI_SELECT_FIELDS as $field_name => $settings) {
+      $selected = $this->normalizeSelectedValues($form_state->getValue($settings['element'], []));
+      $form_state->setValue($field_name, [
+        [
+          'value' => implode(', ', $selected),
+          '_weight' => 0,
+        ],
+      ]);
+    }
+  }
+
+  private function getMetadataOptions(string $field_name, array $selected): array {
+    if (!isset($this->multiSelectOptions[$field_name])) {
+      $values = [];
+      $storage = \Drupal::entityTypeManager()->getStorage('dhcr_course');
+      $ids = $storage->getQuery()
+        ->accessCheck(FALSE)
+        ->execute();
+
+      foreach ($storage->loadMultiple($ids) as $course) {
+        foreach ($this->splitMetadataValues((string) ($course->get($field_name)->value ?? '')) as $value) {
+          $values[$value] = $value;
+        }
+      }
+
+      natcasesort($values);
+      $this->multiSelectOptions[$field_name] = $values;
+    }
+
+    $options = $this->multiSelectOptions[$field_name];
+    foreach ($selected as $value) {
+      $options[$value] = $value;
+    }
+    natcasesort($options);
+
+    return $options;
+  }
+
+  private function normalizeSelectedValues(mixed $values): array {
+    if (!is_array($values)) {
+      return [];
+    }
+
+    $selected = [];
+    foreach ($values as $value) {
+      $value = trim((string) $value);
+      if ($value !== '') {
+        $selected[$value] = $value;
+      }
+    }
+
+    return array_values($selected);
+  }
+
+  private function extractFirstDate(string $value): string {
+    if (preg_match('/\b(\d{4})-(\d{2})-(\d{2})\b/', $value, $matches) === 1) {
+      $date = "{$matches[1]}-{$matches[2]}-{$matches[3]}";
+      return $this->normalizeDateValue($date);
+    }
+
+    return '';
+  }
+
+  private function normalizeDateValue(string $value): string {
+    $value = trim($value);
+    if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value, $matches)) {
+      return '';
+    }
+
+    if (!checkdate((int) $matches[2], (int) $matches[3], (int) $matches[1])) {
+      return '';
+    }
+
+    return $value;
+  }
+
+  private function splitMetadataValues(string $value): array {
+    $values = [];
+    foreach (preg_split('/[;,\n]+/', $value) ?: [] as $part) {
+      $part = trim($part);
+      if ($part !== '') {
+        $values[$part] = $part;
+      }
+    }
+
+    return array_values($values);
   }
 
 }

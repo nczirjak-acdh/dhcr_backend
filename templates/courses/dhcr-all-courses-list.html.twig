@@ -13,7 +13,7 @@
     <div class="dhcr-all-courses__legend-line"><span class="red">{{ 'Red:'|t }}</span> {{ 'Outdated, not shown in the public registry'|t }}</div>
   {% endif %}
 
-  {% if rows|length > 0 %}
+  {% if rows|length > 0 or force_table %}
     <div class="dhcr-table-search">
       <input class="dhcr-table-search__input" type="search" placeholder="{{ 'Search courses'|t }}" data-dhcr-table-search-input>
     </div>
@@ -35,7 +35,7 @@
           <tr>
             <td class="actions">
               {% for action in row.actions %}
-                <a href="{{ action.url }}">{{ action.label }}</a>
+                <a href="{{ action.url }}"{% if action.target %} target="{{ action.target }}"{% endif %}{% if action.rel %} rel="{{ action.rel }}"{% endif %}>{{ action.label }}</a>
               {% endfor %}
             </td>
             <td class="updated {{ row.updated_class }}">{{ row.updated_text }}</td>
@@ -49,6 +49,9 @@
         {% endfor %}
       </tbody>
     </table>
+    {% if rows|length == 0 %}
+      <p>{{ empty }}</p>
+    {% endif %}
   {% else %}
     <p>{{ empty }}</p>
   {% endif %}

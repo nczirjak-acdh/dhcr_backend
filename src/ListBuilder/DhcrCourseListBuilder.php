@@ -26,6 +26,7 @@ final class DhcrCourseListBuilder extends EntityListBuilder {
 
     $query = $storage->getQuery()
       ->accessCheck(FALSE)
+      ->condition('uid', (int) \Drupal::currentUser()->id())
       ->condition('archived', 0)
       ->condition('changed', $cutoff, '>')
       ->sort($sort_field, $direction);
@@ -41,7 +42,7 @@ final class DhcrCourseListBuilder extends EntityListBuilder {
 
   public function render(): array {
     return $this->buildRenderableFromEntities($this->load(), [
-      'heading' => (string) $this->t('All Courses'),
+      'heading' => (string) $this->t('My Courses'),
       'icon' => 'list',
       'empty' => (string) $this->t('No courses available.'),
       'show_legend' => TRUE,
@@ -52,7 +53,14 @@ final class DhcrCourseListBuilder extends EntityListBuilder {
   public function buildRenderableFromEntities(array $entities, array $options = []): array {
     $rows = [];
     foreach ($entities as $entity) {
-      $rows[] = $this->buildRow($entity);
+      $row = $this->buildRow($entity);
+      if (!empty($options['include_approve_action'])) {
+        array_unshift($row['actions'], [
+          'label' => (string) $this->t('Approve'),
+          'url' => Url::fromRoute('dhcr_backend.course_approve', ['dhcr_course' => (int) $entity->id()])->toString(),
+        ]);
+      }
+      $rows[] = $row;
     }
 
     if (empty($options['skip_sort'])) {
@@ -82,6 +90,7 @@ final class DhcrCourseListBuilder extends EntityListBuilder {
       '#sort_links' => $this->buildCourseSortLinks(),
       '#rows' => $rows,
       '#empty' => $options['empty'] ?? (string) $this->t('No courses available.'),
+      '#force_table' => $options['force_table'] ?? FALSE,
       '#attached' => [
         'library' => ['dhcr_backend/admin_all_courses'],
       ],
@@ -105,8 +114,7 @@ final class DhcrCourseListBuilder extends EntityListBuilder {
     $institution = $entity->get('institution')->entity;
     $owner = $entity->get('uid')->entity;
 
-    $course_url = $entity->get('course_url')->first();
-    $course_url_uri = $course_url ? (string) ($course_url->get('uri')->value ?? '') : '';
+    $course_url_uri = $this->getLinkFieldUri($entity, 'course_url');
 
     $actions = [
       [
@@ -119,7 +127,9 @@ final class DhcrCourseListBuilder extends EntityListBuilder {
       ],
       [
         'label' => (string) $this->t('Share'),
-        'url' => $entity->toUrl('edit-form', ['query' => ['action' => 'share']])->toString(),
+        'url' => Url::fromRoute('dhcr_frontend.map', [], ['fragment' => (string) $entity->id()])->toString(),
+        'target' => '_blank',
+        'rel' => 'noopener',
       ],
       [
         'label' => (string) $this->t('Transfer'),
@@ -153,6 +163,20 @@ final class DhcrCourseListBuilder extends EntityListBuilder {
 
     $interval = \Drupal::service('date.formatter')->formatTimeDiffSince($timestamp);
     return $interval . ' ago';
+  }
+
+  private function getLinkFieldUri(EntityInterface $entity, string $field_name): string {
+    if (!$entity->hasField($field_name) || $entity->get($field_name)->isEmpty()) {
+      return '';
+    }
+
+    $item = $entity->get($field_name)->first();
+    if (!$item) {
+      return '';
+    }
+
+    $value = $item->getValue();
+    return trim((string) ($value['uri'] ?? ''));
   }
 
   public function getCourseStatusClass(int $updated_ts, bool $active, bool $archived): string {

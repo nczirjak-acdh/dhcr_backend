@@ -136,3 +136,12 @@
   color: #df0000;
   font-weight: 700;
 }
+
+.dhcr-transfer-info {
+    background-color:#ffe59cf7; 
+    color: #6d7278; 
+    font-weight: 700; 
+    border-radius: 5px; 
+    padding: 1.2em; 
+    margin-bottom: 2em;
+}

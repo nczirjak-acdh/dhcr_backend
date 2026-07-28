@@ -6,8 +6,11 @@ namespace Drupal\dhcr_backend\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
+use Drupal\dhcr_backend\Entity\Course;
 use Drupal\dhcr_backend\Utility\DhcrMapConfig;
 use Drupal\dhcr_backend\Utility\DhcrCourseStatusConfig;
+use Drupal\user\UserInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 final class DhcrDashboardController extends ControllerBase {
@@ -308,6 +311,7 @@ final class DhcrDashboardController extends ControllerBase {
   public function accountApproval(): array {
     $rows = [];
     $user_storage = $this->entityTypeManager()->getStorage('user');
+    $date_formatter = \Drupal::service('date.formatter');
     $ids = $user_storage->getQuery()
       ->accessCheck(FALSE)
       ->condition('uid', 1, '>')
@@ -317,10 +321,26 @@ final class DhcrDashboardController extends ControllerBase {
 
     if ($ids) {
       foreach ($user_storage->loadMultiple($ids) as $account) {
+        if (!$account instanceof UserInterface) {
+          continue;
+        }
+        $profile = $this->loadContributorProfile((int) $account->id());
+        $institution = $profile?->get('institution')->entity;
+        $created = (int) ($profile?->get('created')->value ?? $account->getCreatedTime());
+        $display_name = (string) $account->getDisplayName();
+
         $rows[] = [
-          'name' => (string) $account->getDisplayName(),
-          'mail' => (string) ($account->getEmail() ?? ''),
-          'edit_url' => $account->toUrl('edit-form')->toString(),
+          'approve_url' => Url::fromRoute('dhcr_backend.account_approve', ['user' => (int) $account->id()])->toString(),
+          'view_url' => Url::fromRoute('dhcr_backend.user_view', ['user' => (int) $account->id()])->toString(),
+          'edit_url' => Url::fromRoute('dhcr_backend.user_edit', ['user' => (int) $account->id()])->toString(),
+          'last_name' => (string) ($profile?->get('last_name')->value ?? $display_name),
+          'first_name' => (string) ($profile?->get('first_name')->value ?? ''),
+          'email' => (string) ($profile?->get('email')->value ?? $account->getEmail() ?? ''),
+          'enabled' => ((int) ($profile?->get('enabled')->value ?? $account->isActive()) === 1) ? 'Yes' : 'No',
+          'institution' => $institution ? (string) $institution->label() : '',
+          'other_organisation' => (string) ($profile?->get('other_organisation')->value ?? ''),
+          'request_date' => $created > 0 ? $date_formatter->formatTimeDiffSince($created) . ' ' . (string) $this->t('ago') : '',
+          'request_date_sort' => $created,
         ];
       }
     }
@@ -338,6 +358,29 @@ final class DhcrDashboardController extends ControllerBase {
     ];
   }
 
+  public function approveAccount(UserInterface $user): RedirectResponse {
+    if ((int) $user->id() <= 1) {
+      $this->messenger()->addError($this->t('This account cannot be approved here.'));
+      return $this->redirect('dhcr_backend.account_approval');
+    }
+
+    $user->activate();
+    $user->save();
+
+    $profile = $this->loadContributorProfile((int) $user->id());
+    if ($profile) {
+      $profile->set('enabled', 1);
+      $profile->save();
+    }
+
+    \Drupal::service('user.data')->set('dhcr_backend', (int) $user->id(), 'legacy_approved', 1);
+    $this->messenger()->addStatus($this->t('Approved account for %name.', [
+      '%name' => $user->getDisplayName(),
+    ]));
+
+    return $this->redirect('dhcr_backend.account_approval');
+  }
+
   public function courseApproval(): array {
     $entities = $this->loadCourses([
       'approved' => 0,
@@ -351,7 +394,20 @@ final class DhcrDashboardController extends ControllerBase {
       'icon' => 'school',
       'empty' => (string) $this->t('No courses in this list.'),
       'show_legend' => FALSE,
+      'include_approve_action' => TRUE,
+      'force_table' => TRUE,
     ]);
+  }
+
+  public function approveCourse(Course $dhcr_course): RedirectResponse {
+    $dhcr_course->set('approved', 1);
+    $dhcr_course->save();
+
+    $this->messenger()->addStatus($this->t('Approved course %title.', [
+      '%title' => $dhcr_course->label(),
+    ]));
+
+    return $this->redirect('dhcr_backend.course_approval');
   }
 
   public function courseExpiry(): array {
@@ -419,6 +475,17 @@ final class DhcrDashboardController extends ControllerBase {
     catch (\Throwable) {
       return 0;
     }
+  }
+
+  private function loadContributorProfile(int $uid) {
+    $storage = $this->entityTypeManager()->getStorage('dhcr_contributor_profile');
+    $ids = $storage->getQuery()
+      ->accessCheck(FALSE)
+      ->condition('user', $uid)
+      ->range(0, 1)
+      ->execute();
+
+    return $ids ? $storage->load((int) reset($ids)) : NULL;
   }
 
   private function countPendingCourses(): int {

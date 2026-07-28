@@ -123,6 +123,7 @@ function dhcr_backend_theme(): array {
         'sort_links' => [],
         'rows' => [],
         'empty' => '',
+        'force_table' => FALSE,
       ],
       'template' => 'dhcr-all-courses-list',
       'path' => $templates_path . '/courses',
@@ -226,6 +227,17 @@ function dhcr_backend_theme(): array {
         'pager' => [],
       ],
       'template' => 'dhcr-pending-invitations',
+      'path' => $templates_path . '/contributor-network',
+    ],
+    'dhcr_user_details' => [
+      'variables' => [
+        'title' => '',
+        'edit_url' => '',
+        'account_status' => [],
+        'details' => [],
+        'roles' => [],
+      ],
+      'template' => 'dhcr-user-details',
       'path' => $templates_path . '/contributor-network',
     ],
     'dhcr_moderators' => [

@@ -84,7 +84,7 @@ final class DhcrCourseTransferForm extends FormBase {
 
     $form['transfer_info'] = [
       '#type' => 'markup',
-      '#markup' => '<p style="padding: 1.2em; border: 1px solid #ffbf01; border-radius: 5px; background-color: #ffe59cf7; font-weight: bolder; color: #6d7278; font-size: 0.8rem; margin-bottom: 2em; ">'
+      '#markup' => '<div class="dhcr-transfer-info" ><p style="padding: 1.2em; border: 1px solid #ffbf01; border-radius: 5px; background-color: #ffe59cf7; font-weight: bolder; color: #6d7278; font-size: 0.8rem; margin-bottom: 2em; ">'
         . $this->t('The <strong><u><i>course owner</i></u></strong> is the person who has entered the course in the registry, can see it in My Courses and receives the reminder emails. These details are not public visible.')
         . '<br>&nbsp;<br>'
         . $this->t('The <strong><u><i>lecturer</i></u></strong> name and email address are shown public in the course detail page.')
@@ -94,7 +94,7 @@ final class DhcrCourseTransferForm extends FormBase {
         . $this->t('Moderators can transfer courses between users within their moderated country. Admins can transfer between all users.')
         . '<br>&nbsp;<br>'
         . $this->t('Transfering a course does not update the course. If the course is outdated you need to update it separately.')
-        . '</p>',
+        . '</p></div>',
       '#weight' => -99,
     ];
 

@@ -78,6 +78,14 @@ dhcr_backend.user_edit:
   requirements:
     _permission: 'administer_dhcr_backend'
 
+dhcr_backend.user_view:
+  path: '/admin/content/dhcr/contributor-network/users/{user}/view'
+  defaults:
+    _controller: '\Drupal\dhcr_backend\Controller\DhcrContributorController::userView'
+    _title: 'User Details'
+  requirements:
+    _permission: 'administer_dhcr_backend'
+
 dhcr_backend.statistics:
   path: '/admin/content/dhcr/statistics'
   defaults:
@@ -142,6 +150,15 @@ dhcr_backend.account_approval:
   requirements:
     _permission: 'administer_dhcr_backend'
 
+dhcr_backend.account_approve:
+  path: '/admin/content/dhcr/needs-attention/account-approval/{user}/approve'
+  defaults:
+    _controller: '\Drupal\dhcr_backend\Controller\DhcrDashboardController::approveAccount'
+    _title: 'Approve Account'
+  requirements:
+    _permission: 'administer_dhcr_backend'
+    _csrf_token: 'TRUE'
+
 dhcr_backend.course_approval:
   path: '/admin/content/dhcr/needs-attention/course-approval'
   defaults:
@@ -149,6 +166,15 @@ dhcr_backend.course_approval:
     _title: 'Course Approval'
   requirements:
     _permission: 'administer_dhcr_backend'
+
+dhcr_backend.course_approve:
+  path: '/admin/content/dhcr/needs-attention/course-approval/{dhcr_course}/approve'
+  defaults:
+    _controller: '\Drupal\dhcr_backend\Controller\DhcrDashboardController::approveCourse'
+    _title: 'Approve Course'
+  requirements:
+    _permission: 'administer_dhcr_backend'
+    _csrf_token: 'TRUE'
 
 dhcr_backend.course_expiry:
   path: '/admin/content/dhcr/needs-attention/course-expiry'

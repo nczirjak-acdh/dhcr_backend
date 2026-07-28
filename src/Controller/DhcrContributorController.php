@@ -7,6 +7,7 @@ namespace Drupal\dhcr_backend\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
 use Drupal\dhcr_backend\ListBuilder\DhcrSortableRowsTrait;
+use Drupal\user\UserInterface;
 
 final class DhcrContributorController extends ControllerBase {
   use DhcrSortableRowsTrait;
@@ -61,11 +62,12 @@ final class DhcrContributorController extends ControllerBase {
     foreach ($profiles as $profile) {
       $account = $profile->get('user')->entity;
       $institution = $profile->get('institution')->entity;
+      $user_view_url = $account ? Url::fromRoute('dhcr_backend.user_view', ['user' => (int) $account->id()])->toString() : '';
       $user_edit_url = $account ? Url::fromRoute('dhcr_backend.user_edit', ['user' => (int) $account->id()])->toString() : '';
 
       $rows[] = [
         'id' => (string) $profile->id(),
-        'view_url' => $user_edit_url,
+        'view_url' => $user_view_url,
         'edit_url' => $user_edit_url,
         'last_name' => (string) ($profile->get('last_name')->value ?? ''),
         'first_name' => (string) ($profile->get('first_name')->value ?? ''),
@@ -146,11 +148,12 @@ final class DhcrContributorController extends ControllerBase {
     foreach ($profiles as $profile) {
       $account = $profile->get('user')->entity;
       $institution = $profile->get('institution')->entity;
+      $user_view_url = $account ? Url::fromRoute('dhcr_backend.user_view', ['user' => (int) $account->id()])->toString() : '';
       $user_edit_url = $account ? Url::fromRoute('dhcr_backend.user_edit', ['user' => (int) $account->id()])->toString() : '';
 
       $rows[] = [
         'id' => (string) $profile->id(),
-        'view_url' => $user_edit_url,
+        'view_url' => $user_view_url,
         'edit_url' => $user_edit_url,
         'last_name' => (string) ($profile->get('last_name')->value ?? ''),
         'first_name' => (string) ($profile->get('first_name')->value ?? ''),
@@ -177,6 +180,88 @@ final class DhcrContributorController extends ControllerBase {
     ]);
   }
 
+  public function userView(UserInterface $user): array {
+    $profile = $this->loadProfile((int) $user->id());
+    $legacy = $this->loadLegacyUserData($user);
+    $institution = $profile?->get('institution')->entity;
+    $full_name = trim((string) ($profile?->get('first_name')->value ?? '') . ' ' . (string) ($profile?->get('last_name')->value ?? ''));
+    if ($full_name === '') {
+      $full_name = (string) $user->getDisplayName();
+    }
+
+    return [
+      '#theme' => 'dhcr_user_details',
+      '#title' => $full_name,
+      '#edit_url' => Url::fromRoute('dhcr_backend.user_edit', ['user' => (int) $user->id()])->toString(),
+      '#account_status' => [
+        [
+          'label' => (string) $this->t('Email Verified'),
+          'value' => $this->yesNo((int) $legacy['email_verified'] === 1),
+          'state' => ((int) $legacy['email_verified'] === 1) ? 'yes' : 'no',
+        ],
+        [
+          'label' => (string) $this->t('Password Set'),
+          'value' => $this->yesNo((int) $legacy['password_set'] === 1),
+          'state' => ((int) $legacy['password_set'] === 1) ? 'yes' : 'no',
+        ],
+        [
+          'label' => (string) $this->t('Approved'),
+          'value' => $this->yesNo((int) $legacy['approved'] === 1),
+          'state' => ((int) $legacy['approved'] === 1) ? 'yes' : 'no',
+        ],
+        [
+          'label' => (string) $this->t('User account enabled'),
+          'value' => $this->yesNo($user->isActive() && (int) ($profile?->get('enabled')->value ?? 1) === 1),
+          'state' => ($user->isActive() && (int) ($profile?->get('enabled')->value ?? 1) === 1) ? 'yes' : 'no',
+        ],
+      ],
+      '#details' => [
+        [
+          'label' => (string) $this->t('Email Address'),
+          'value' => (string) ($profile?->get('email')->value ?? $user->getEmail() ?? ''),
+        ],
+        [
+          'label' => (string) $this->t('Contributor Mailing List Subscription'),
+          'value' => $this->yesNo((int) $legacy['mail_list'] === 1),
+        ],
+        [
+          'label' => (string) $this->t('Institution'),
+          'value' => $institution ? (string) $institution->label() : (string) $this->t('Empty!'),
+          'state' => $institution ? '' : 'no',
+        ],
+        [
+          'label' => (string) $this->t('About'),
+          'value' => (string) $legacy['about'],
+        ],
+      ],
+      '#roles' => [
+        [
+          'label' => (string) $this->t('Moderator'),
+          'value' => $this->yesNo($user->hasRole('moderator')),
+        ],
+        [
+          'label' => (string) $this->t('Moderated country'),
+          'value' => $this->countryLabel((int) $legacy['country_id']) ?: '-',
+        ],
+        [
+          'label' => (string) $this->t('Admin'),
+          'value' => $this->yesNo($user->hasRole('administrator') || (int) $legacy['is_admin'] === 1),
+        ],
+        [
+          'label' => (string) $this->t('Show as admin on contact page'),
+          'value' => $this->yesNo((int) $legacy['user_admin'] === 1),
+        ],
+      ],
+      '#attached' => [
+        'library' => ['dhcr_backend/admin_user_edit'],
+      ],
+      '#cache' => [
+        'contexts' => ['user'],
+        'tags' => ['user:' . $user->id()],
+      ],
+    ];
+  }
+
   public function reinviteUser($dhcr_user_invitation): array {
     $invitation = $this->entityTypeManager()->getStorage('dhcr_user_invitation')->load($dhcr_user_invitation);
     if ($invitation) {
@@ -188,6 +273,51 @@ final class DhcrContributorController extends ControllerBase {
     }
 
     return $this->redirect('dhcr_backend.pending_invitations');
+  }
+
+  private function yesNo(bool $value): string {
+    return $value ? (string) $this->t('Yes') : (string) $this->t('No');
+  }
+
+  private function loadProfile(int $uid) {
+    $storage = $this->entityTypeManager()->getStorage('dhcr_contributor_profile');
+    $ids = $storage->getQuery()
+      ->accessCheck(FALSE)
+      ->condition('user', $uid)
+      ->range(0, 1)
+      ->execute();
+
+    return $ids ? $storage->load((int) reset($ids)) : NULL;
+  }
+
+  private function loadLegacyUserData(UserInterface $user): array {
+    $uid = (int) $user->id();
+    $module = 'dhcr_backend';
+    $user_data = \Drupal::service('user.data');
+
+    $password_set = $user_data->get($module, $uid, 'legacy_password_set');
+    if ($password_set === NULL) {
+      $password_set = $user->getPassword() ? 1 : 0;
+    }
+
+    return [
+      'email_verified' => (int) ($user_data->get($module, $uid, 'legacy_email_verified') ?? 0),
+      'password_set' => (int) $password_set,
+      'approved' => (int) ($user_data->get($module, $uid, 'legacy_approved') ?? 0),
+      'mail_list' => (int) ($user_data->get($module, $uid, 'legacy_mail_list') ?? 0),
+      'about' => (string) ($user_data->get($module, $uid, 'legacy_about') ?? ''),
+      'is_admin' => (int) ($user_data->get($module, $uid, 'legacy_is_admin') ?? ($user->hasRole('administrator') ? 1 : 0)),
+      'user_admin' => (int) ($user_data->get($module, $uid, 'legacy_user_admin') ?? 0),
+      'country_id' => (int) ($user_data->get($module, $uid, 'legacy_country_id') ?? 0),
+    ];
+  }
+
+  private function countryLabel(int $country_id): string {
+    if ($country_id <= 0) {
+      return '';
+    }
+    $country = $this->entityTypeManager()->getStorage('dhcr_country')->load($country_id);
+    return $country ? (string) $country->label() : '';
   }
 
   private function buildContributorTable(string $theme, string $heading, string $icon, array $rows, array $sort_columns): array {

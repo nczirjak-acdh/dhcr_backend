@@ -1,0 +1,46 @@
+<div class="dhcr-user-details">
+  <h2 class="dhcr-user-details__heading">
+    <span class="dhcr-user-details__icon" aria-hidden="true"><i class="fas fa-user"></i></span>
+    {{ 'User Details'|t }}
+  </h2>
+
+  <a class="dhcr-user-details__edit" href="{{ edit_url }}">{{ 'Edit User'|t }}</a>
+
+  <h3 class="dhcr-user-details__name">{{ title }}</h3>
+
+  <section class="dhcr-user-details__section">
+    <h4>{{ 'Account status'|t }}</h4>
+    <dl class="dhcr-user-details__list">
+      {% for item in account_status %}
+        <div class="dhcr-user-details__row">
+          <dt>{{ item.label }}:</dt>
+          <dd class="{{ item.state is defined and item.state ? 'is-' ~ item.state : '' }}">{{ item.value }}</dd>
+        </div>
+      {% endfor %}
+    </dl>
+  </section>
+
+  <section class="dhcr-user-details__section">
+    <h4>{{ 'Details'|t }}</h4>
+    <dl class="dhcr-user-details__list">
+      {% for item in details %}
+        <div class="dhcr-user-details__row">
+          <dt>{{ item.label }}:</dt>
+          <dd class="{{ item.state is defined and item.state ? 'is-' ~ item.state : '' }}">{{ item.value }}</dd>
+        </div>
+      {% endfor %}
+    </dl>
+  </section>
+
+  <section class="dhcr-user-details__section">
+    <h4>{{ 'User roles'|t }}</h4>
+    <dl class="dhcr-user-details__list">
+      {% for item in roles %}
+        <div class="dhcr-user-details__row">
+          <dt>{{ item.label }}:</dt>
+          <dd>{{ item.value }}</dd>
+        </div>
+      {% endfor %}
+    </dl>
+  </section>
+</div>

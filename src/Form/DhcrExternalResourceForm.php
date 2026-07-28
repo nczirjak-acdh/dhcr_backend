@@ -8,6 +8,21 @@ use Drupal\Core\Form\FormStateInterface;
 
 final class DhcrExternalResourceForm extends DhcrContentEntityForm {
 
+  private const RESOURCE_TYPE_OPTIONS = [
+    '' => '',
+    'Dataset' => 'Dataset',
+    'Training Material' => 'Training Material',
+    'Service' => 'Service',
+    'Software' => 'Software',
+  ];
+
+  private const AFFILIATION_OPTIONS = [
+    '' => '',
+    'CLARIN' => 'CLARIN',
+    'DARIAH' => 'DARIAH',
+    'CLARIN & DARIAH' => 'CLARIN & DARIAH',
+  ];
+
   public function form(array $form, FormStateInterface $form_state): array {
     $form = parent::form($form, $form_state);
 
@@ -38,6 +53,9 @@ final class DhcrExternalResourceForm extends DhcrContentEntityForm {
       $form['resource_url']['widget'][0]['uri']['#title'] = $this->t('Url');
     }
 
+    $this->convertTextFieldToSelect($form, 'resource_type', $this->t('Type'), self::RESOURCE_TYPE_OPTIONS);
+    $this->convertTextFieldToSelect($form, 'affiliation', $this->t('Affiliation'), self::AFFILIATION_OPTIONS);
+
     return $form;
   }
 
@@ -48,5 +66,23 @@ final class DhcrExternalResourceForm extends DhcrContentEntityForm {
       $actions['submit']['#attributes']['class'][] = 'button--dhcr-outline';
     }
     return $actions;
+  }
+
+  private function convertTextFieldToSelect(array &$form, string $field_name, mixed $title, array $options): void {
+    if (!isset($form[$field_name]['widget'][0]['value'])) {
+      return;
+    }
+
+    $element = &$form[$field_name]['widget'][0]['value'];
+    $default_value = trim((string) ($element['#default_value'] ?? ''));
+    if ($default_value !== '' && !isset($options[$default_value])) {
+      $options[$default_value] = $default_value;
+    }
+
+    $element['#type'] = 'select';
+    $element['#title'] = $title;
+    $element['#options'] = $options;
+    $element['#default_value'] = $default_value;
+    unset($element['#size'], $element['#maxlength'], $element['#placeholder'], $element['#autocomplete_route_name']);
   }
 }

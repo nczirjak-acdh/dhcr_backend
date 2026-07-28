@@ -8,17 +8,31 @@
     <table class="dhcr-account-approval__table" data-dhcr-table-search-table>
       <thead>
         <tr>
-          <th>{{ 'Name'|t }}</th>
-          <th>{{ 'E-Mail'|t }}</th>
-          <th>{{ 'Action'|t }}</th>
+          <th>{{ 'Actions'|t }}</th>
+          <th>{{ 'Last Name'|t }}</th>
+          <th>{{ 'First Name'|t }}</th>
+          <th>{{ 'Email'|t }}</th>
+          <th>{{ 'Account enabled'|t }}</th>
+          <th>{{ 'Institution'|t }}</th>
+          <th>{{ 'Other Organisation'|t }}</th>
+          <th>{{ 'Request Date'|t }}</th>
         </tr>
       </thead>
       <tbody>
         {% for row in rows %}
-          <tr>
-            <td>{{ row.name }}</td>
-            <td>{{ row.mail }}</td>
-            <td><a href="{{ row.edit_url }}">{{ 'Edit'|t }}</a></td>
+          <tr data-dhcr-search-text="{{ [row.last_name, row.first_name, row.email, row.enabled, row.institution, row.other_organisation, row.request_date]|join(' ')|lower|trim }}">
+            <td class="actions">
+              <a href="{{ row.approve_url }}">{{ 'Approve'|t }}</a>
+              <a href="{{ row.view_url }}">{{ 'View'|t }}</a>
+              <a href="{{ row.edit_url }}">{{ 'Edit'|t }}</a>
+            </td>
+            <td>{{ row.last_name }}</td>
+            <td>{{ row.first_name }}</td>
+            <td>{{ row.email }}</td>
+            <td class="{{ row.enabled == 'Yes' ? 'enabled' : '' }}">{{ row.enabled }}</td>
+            <td>{{ row.institution }}</td>
+            <td>{{ row.other_organisation }}</td>
+            <td>{{ row.request_date }}</td>
           </tr>
         {% endfor %}
       </tbody>

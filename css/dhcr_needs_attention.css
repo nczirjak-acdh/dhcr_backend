@@ -110,11 +110,21 @@
 .dhcr-account-approval__table td {
   color: #66707d;
   padding: 10px 12px;
+  vertical-align: top;
 }
 
 .dhcr-account-approval__table a {
   color: #0068c9;
   text-decoration: none;
+}
+
+.dhcr-account-approval__table td.actions a {
+  display: block;
+}
+
+.dhcr-account-approval__table td.enabled {
+  color: #0b8f22;
+  font-weight: 700;
 }
 
 @media (max-width: 767px) {
