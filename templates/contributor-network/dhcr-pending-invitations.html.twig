@@ -21,8 +21,12 @@
         <tr data-dhcr-search-text="{{ [row.last_name, row.first_name, row.email, row.enabled, row.institution, row.valid_until]|join(' ')|lower|trim }}">
           <td class="actions">
             <a href="{{ row.reinvite_url }}">{{ 'Reinvite'|t }}</a>
-            <a href="{{ row.view_url }}">{{ 'View'|t }}</a>
-            <a href="{{ row.edit_url }}">{{ 'Edit'|t }}</a>
+            {% if row.view_url %}
+              <a href="{{ row.view_url }}">{{ 'View'|t }}</a>
+            {% endif %}
+            {% if row.edit_url %}
+              <a href="{{ row.edit_url }}">{{ 'Edit'|t }}</a>
+            {% endif %}
           </td>
           <td>{{ row.last_name }}</td>
           <td>{{ row.first_name }}</td>

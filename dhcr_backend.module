@@ -269,3 +269,17 @@ function dhcr_backend_page_attachments(array &$attachments): void {
     $attachments['#attached']['library'][] = 'dhcr_backend/admin_table_search';
   }
 }
+
+/**
+ * Implements hook_form_alter().
+ */
+function dhcr_backend_form_alter(array &$form, \Drupal\Core\Form\FormStateInterface $form_state, string $form_id): void {
+  $route_name = \Drupal::routeMatch()->getRouteName() ?? '';
+
+  if (
+    str_starts_with($route_name, 'dhcr_backend.') ||
+    str_starts_with($route_name, 'entity.dhcr_')
+  ) {
+    $form['#attributes']['class'][] = 'dhcr-backend-form';
+  }
+}

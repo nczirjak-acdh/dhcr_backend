@@ -29,6 +29,15 @@
   font-size: 0.8rem;
 }
 
+form.dhcr-backend-form,
+form[class^="dhcr-backend-"],
+form[class*=" dhcr-backend-"] {
+  border: 2px solid #b3b8be;
+  box-sizing: border-box;
+  margin: 24px;
+  padding: 24px;
+}
+
 .dhcr-dashboard h1,
 .dhcr-category-lists h1,
 .dhcr-courses-admin h1,

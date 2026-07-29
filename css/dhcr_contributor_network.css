@@ -4,12 +4,20 @@
 
 .dhcr-contributor-network__heading,
 .dhcr-users-view__heading,
-.dhcr-invite-user-form__heading {
+.dhcr-invite-user-form__heading,
+.dhcr-reinvite-user-form__heading {
   margin: 0 0 24px;
   color: #1f73b5;
   text-transform: uppercase;
   font-size: 1.75rem;
   font-weight: 800;
+}
+
+.dhcr-invite-user-form__heading,
+.dhcr-reinvite-user-form__heading {
+  align-items: center;
+  display: flex;
+  gap: 14px;
 }
 
 .dhcr-contributor-network__grid {
@@ -122,6 +130,7 @@
 .dhcr-users-view__pager,
 .dhcr-users-view__summary,
 .dhcr-invite-user-form__intro,
+.dhcr-reinvite-user-form__intro,
 .dhcr-invite-user-form__step-copy,
 .dhcr-invite-user-form__preview-list,
 .dhcr-invite-user-form__note-title,
@@ -142,27 +151,75 @@
 
 .dhcr-invite-user-form fieldset {
   border: 2px solid #b3b8be;
-  margin: 0 0 24px;
+  margin: 54px 0 24px;
+  padding: 28px 0 18px;
 }
 
-.dhcr-invite-user-form label {
+.dhcr-reinvite-user-form fieldset {
+  border: 2px solid #b3b8be;
+  margin: 82px 0 60px;
+  padding: 34px 0 36px;
+}
+
+.dhcr-invite-user-form__fieldset > legend,
+.dhcr-reinvite-user-form__fieldset > legend {
+  color: #66707d;
+  font-size: 1.05rem;
+  padding: 0 4px;
+}
+
+.dhcr-invite-user-form label,
+.dhcr-reinvite-user-form label {
   color: #1f73b5;
   font-weight: 700;
+}
+
+.dhcr-invite-user-form__fieldset .form-item {
+  align-items: center;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(220px, 34%) minmax(0, 1fr);
+  margin: 18px 0;
+}
+
+.dhcr-invite-user-form__fieldset .form-item > label {
+  margin: 0;
+}
+
+.dhcr-invite-user-form__fieldset .form-item > input,
+.dhcr-invite-user-form__fieldset .form-item > select,
+.dhcr-invite-user-form__fieldset .form-item > textarea {
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .dhcr-invite-user-form input[type="text"],
 .dhcr-invite-user-form input[type="email"],
 .dhcr-invite-user-form select,
-.dhcr-invite-user-form textarea {
+.dhcr-invite-user-form textarea,
+.dhcr-reinvite-user-form select {
   border: 2px solid #1f73b5;
   border-radius: 9px;
+  box-sizing: border-box;
+  min-height: 36px;
+  width: 100%;
 }
 
 .dhcr-invite-user-form__step-title {
   color: #1f73b5;
-  font-size: 1.25rem;
+  font-size: 1.45rem;
   font-weight: 700;
-  margin: 18px 0 12px;
+  margin: 22px 0 18px;
+}
+
+.dhcr-invite-user-form__step-copy {
+  margin: 0 0 18px;
+}
+
+.dhcr-invite-user-form__step-copy a,
+.dhcr-invite-user-form__preview-list a {
+  color: #0068c9;
+  text-decoration: none;
 }
 
 .dhcr-invite-user-form__note-title {
@@ -171,7 +228,53 @@
   margin-top: 10px;
 }
 
-.dhcr-invite-user-form .button--dhcr-outline {
+.dhcr-invite-user-form__preview-title {
+  font-weight: 700;
+  margin-top: 22px;
+}
+
+.dhcr-invite-user-form__preview-list {
+  line-height: 1.45;
+  margin: 6px 0 18px;
+}
+
+.dhcr-reinvite-user-form__section-title {
+  color: #1f73b5;
+  font-size: 1.75rem;
+  margin: 0 0 18px;
+}
+
+.dhcr-reinvite-user-form__details {
+  color: #66707d;
+  font-size: 1.35rem;
+  margin: 0 0 32px;
+}
+
+.dhcr-reinvite-user-form__detail-row {
+  display: grid;
+  gap: 28px;
+  grid-template-columns: 250px minmax(0, 1fr);
+  margin: 18px 0;
+}
+
+.dhcr-reinvite-user-form__detail-row dt {
+  font-weight: 400;
+}
+
+.dhcr-reinvite-user-form__detail-row dd {
+  margin: 0;
+}
+
+.dhcr-reinvite-user-form__fieldset .form-item {
+  align-items: center;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(250px, 34%) minmax(0, 1fr);
+  margin: 18px 0;
+}
+
+.dhcr-invite-user-form .button--dhcr-outline,
+.dhcr-reinvite-user-form .button--dhcr-outline {
   display: inline-block;
   border: 4px solid #1f73b5;
   color: #1f73b5;
@@ -183,4 +286,15 @@
   font-weight: 800;
   padding: 12px 28px;
   margin: 0 0 26px;
+}
+
+@media (max-width: 760px) {
+  .dhcr-invite-user-form__fieldset .form-item {
+    grid-template-columns: 1fr;
+  }
+
+  .dhcr-reinvite-user-form__detail-row,
+  .dhcr-reinvite-user-form__fieldset .form-item {
+    grid-template-columns: 1fr;
+  }
 }

@@ -104,12 +104,14 @@ final class DhcrContributorController extends ControllerBase {
     foreach ($invitations as $invitation) {
       $institution = $invitation->get('institution')->entity;
       $valid_until = (int) ($invitation->get('valid_until')->value ?? 0);
+      $account = $invitation->get('user')->entity;
+      $user_id = $account ? (int) $account->id() : 0;
 
       $rows[] = [
         'id' => (string) $invitation->id(),
         'reinvite_url' => Url::fromRoute('dhcr_backend.reinvite_user', ['dhcr_user_invitation' => $invitation->id()])->toString(),
-        'view_url' => $invitation->toUrl('edit-form')->toString(),
-        'edit_url' => $invitation->toUrl('edit-form')->toString(),
+        'view_url' => $user_id > 0 ? Url::fromRoute('dhcr_backend.user_view', ['user' => $user_id])->toString() : '',
+        'edit_url' => $user_id > 0 ? Url::fromRoute('dhcr_backend.user_edit', ['user' => $user_id])->toString() : '',
         'last_name' => (string) ($invitation->get('last_name')->value ?? ''),
         'first_name' => (string) ($invitation->get('first_name')->value ?? ''),
         'email' => (string) ($invitation->get('email')->value ?? ''),
@@ -251,6 +253,10 @@ final class DhcrContributorController extends ControllerBase {
           'label' => (string) $this->t('Show as admin on contact page'),
           'value' => $this->yesNo((int) $legacy['user_admin'] === 1),
         ],
+        [
+          'label' => (string) $this->t('Show this user in the National Moderators List'),
+          'value' => $this->yesNo((int) $legacy['national_moderator_list'] === 1),
+        ],
       ],
       '#attached' => [
         'library' => ['dhcr_backend/admin_user_edit'],
@@ -308,6 +314,7 @@ final class DhcrContributorController extends ControllerBase {
       'about' => (string) ($user_data->get($module, $uid, 'legacy_about') ?? ''),
       'is_admin' => (int) ($user_data->get($module, $uid, 'legacy_is_admin') ?? ($user->hasRole('administrator') ? 1 : 0)),
       'user_admin' => (int) ($user_data->get($module, $uid, 'legacy_user_admin') ?? 0),
+      'national_moderator_list' => (int) ($user_data->get($module, $uid, 'legacy_national_moderator_list') ?? 0),
       'country_id' => (int) ($user_data->get($module, $uid, 'legacy_country_id') ?? 0),
     ];
   }

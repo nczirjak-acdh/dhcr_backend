@@ -6,6 +6,7 @@ namespace Drupal\dhcr_backend\Form;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -55,7 +56,7 @@ final class DhcrInviteUserForm extends DhcrContentEntityForm {
     if (isset($form['institution']['widget'][0]['target_id'])) {
       $form['institution']['widget'][0]['target_id']['#type'] = 'select';
       $form['institution']['widget'][0]['target_id']['#title'] = $this->t('Institution*');
-      $form['institution']['widget'][0]['target_id']['#empty_option'] = $this->t('- Select institution -');
+      $form['institution']['widget'][0]['target_id']['#empty_option'] = '';
       $form['institution']['widget'][0]['target_id']['#required'] = TRUE;
     }
 
@@ -86,9 +87,8 @@ final class DhcrInviteUserForm extends DhcrContentEntityForm {
       '#type' => 'markup',
       '#weight' => -50,
       '#markup' => '<div class="dhcr-invite-user-form__step-title">' . $this->t('Step 1: Select an institution for the new user') . '</div>'
-        . '<div class="dhcr-invite-user-form__step-copy">' . $this->t('Select an institution from the drop-down list. If the institution is not listed, go to @link.', [
-          '@link' => $this->t('Add Institution'),
-        ]) . '</div>',
+        . '<div class="dhcr-invite-user-form__step-copy">' . $this->t('Select an institution from the drop-down list. If the institution is not listed, go to') . ' '
+        . '<a href="' . Url::fromRoute('entity.dhcr_institution.add_form')->toString() . '">' . $this->t('Add Institution') . '</a>.</div>',
     ];
 
     $form['dhcr_step_2'] = [
@@ -104,7 +104,7 @@ final class DhcrInviteUserForm extends DhcrContentEntityForm {
         . '<div class="dhcr-invite-user-form__note-title">' . $this->t('Note for non-English countries') . '</div>'
         . '<div class="dhcr-invite-user-form__step-copy">' . $this->t('Users may respond better to an invitation in their mother language. Although the interface and the metadata in the Course Registry are in English, you have the possibility to localize the invitation message.') . '</div>'
         . '<div class="dhcr-invite-user-form__preview-title">' . $this->t('Preview localized messages') . '</div>'
-        . '<div class="dhcr-invite-user-form__preview-list">' . implode('<br>', array_map(static fn(string $name): string => $name, self::LOCALIZATION_NAMES)) . '</div>',
+        . '<div class="dhcr-invite-user-form__preview-list">' . implode('<br>', $this->buildTranslationPreviewLinks()) . '</div>',
     ];
 
     if (isset($form['name'])) {
@@ -122,6 +122,9 @@ final class DhcrInviteUserForm extends DhcrContentEntityForm {
     if (isset($form['legacy_user_id'])) {
       $form['legacy_user_id']['#access'] = FALSE;
     }
+
+    $this->ensureInviteUserElements($form);
+    $this->groupInviteUserFields($form);
 
     return $form;
   }
@@ -202,13 +205,154 @@ final class DhcrInviteUserForm extends DhcrContentEntityForm {
     $ids = $storage->getQuery()
       ->accessCheck(FALSE)
       ->condition('name', self::LOCALIZATION_NAMES, 'IN')
+      ->execute();
+
+    $options = [];
+    $languages_by_name = [];
+    foreach ($storage->loadMultiple($ids) as $language) {
+      $languages_by_name[(string) $language->label()] = $language;
+    }
+
+    foreach (self::LOCALIZATION_NAMES as $name) {
+      if (isset($languages_by_name[$name])) {
+        $language = $languages_by_name[$name];
+        $options[(string) $language->id()] = (string) $language->label();
+      }
+    }
+    return $options;
+  }
+
+  private function ensureInviteUserElements(array &$form): void {
+    $entity = $this->getEntity();
+
+    if (!isset($form['institution'])) {
+      $form['institution'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Institution*'),
+        '#options' => $this->getInstitutionOptions(),
+        '#empty_option' => '',
+        '#default_value' => (string) ($entity->get('institution')->target_id ?? ''),
+        '#required' => TRUE,
+        '#parents' => ['institution'],
+      ];
+    }
+
+    foreach ([
+      'academic_title' => ['title' => 'Academic Title', 'type' => 'textfield', 'required' => FALSE],
+      'first_name' => ['title' => 'First Name*', 'type' => 'textfield', 'required' => TRUE],
+      'last_name' => ['title' => 'Last Name*', 'type' => 'textfield', 'required' => TRUE],
+      'email' => ['title' => 'Institutional Email Address*', 'type' => 'email', 'required' => TRUE],
+    ] as $field_name => $settings) {
+      if (isset($form[$field_name])) {
+        continue;
+      }
+
+      $form[$field_name] = [
+        '#type' => $settings['type'],
+        '#title' => $this->t($settings['title']),
+        '#default_value' => (string) ($entity->get($field_name)->value ?? ''),
+        '#required' => $settings['required'],
+        '#parents' => [$field_name],
+      ];
+    }
+
+    if (!isset($form['localization'])) {
+      $options = $this->getLocalizationOptions();
+      $default_value = (string) ($entity->get('localization')->target_id ?? '');
+      if ($default_value === '') {
+        $default_value = (string) array_search('English', $options, TRUE);
+      }
+
+      $form['localization'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Choose localization*'),
+        '#options' => $options,
+        '#default_value' => $default_value,
+        '#required' => TRUE,
+        '#parents' => ['localization'],
+      ];
+    }
+  }
+
+  private function getInstitutionOptions(): array {
+    $storage = $this->entityTypeManager->getStorage('dhcr_institution');
+    $ids = $storage->getQuery()
+      ->accessCheck(FALSE)
       ->sort('name', 'ASC')
       ->execute();
 
     $options = [];
-    foreach ($storage->loadMultiple($ids) as $language) {
-      $options[(string) $language->id()] = (string) $language->label();
+    foreach ($storage->loadMultiple($ids) as $institution) {
+      $options[(string) $institution->id()] = (string) $institution->label();
     }
+
     return $options;
+  }
+
+  private function buildTranslationPreviewLinks(): array {
+    $translations = $this->loadInviteTranslationsByLanguage();
+    $links = [];
+
+    foreach (self::LOCALIZATION_NAMES as $name) {
+      if (!isset($translations[$name])) {
+        $links[] = $name;
+        continue;
+      }
+
+      $translation = $translations[$name];
+      $links[] = '<a href="' . $translation->toUrl('edit-form')->toString() . '">' . $name . '</a>';
+    }
+
+    return $links;
+  }
+
+  private function loadInviteTranslationsByLanguage(): array {
+    $storage = $this->entityTypeManager->getStorage('dhcr_invite_translation');
+    $ids = $storage->getQuery()
+      ->accessCheck(FALSE)
+      ->execute();
+
+    $translations = [];
+    foreach ($storage->loadMultiple($ids) as $translation) {
+      $language = $translation->get('language')->entity;
+      if ($language) {
+        $translations[(string) $language->label()] = $translation;
+      }
+    }
+
+    return $translations;
+  }
+
+  private function groupInviteUserFields(array &$form): void {
+    $form['invite_user'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Invite User'),
+      '#weight' => -90,
+      '#attributes' => [
+        'class' => ['dhcr-invite-user-form__fieldset'],
+      ],
+    ];
+
+    $items = [
+      'dhcr_step_1' => -30,
+      'institution' => -29,
+      'dhcr_step_2' => -20,
+      'academic_title' => -19,
+      'first_name' => -18,
+      'last_name' => -17,
+      'email' => -16,
+      'dhcr_step_3' => -10,
+      'localization' => -9,
+    ];
+
+    foreach ($items as $key => $weight) {
+      if (!isset($form[$key])) {
+        continue;
+      }
+
+      $form[$key]['#weight'] = $weight;
+      $form['invite_user'][$key] = $form[$key];
+      unset($form[$key]);
+    }
   }
 }

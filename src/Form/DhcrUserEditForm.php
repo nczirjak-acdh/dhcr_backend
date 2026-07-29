@@ -174,6 +174,23 @@ final class DhcrUserEditForm extends FormBase {
       '#markup' => '<p>' . $this->t('Moderated country') . ': ' . ($moderated_country !== '' ? $moderated_country : '-') . '</p>',
       '#weight' => -82,
     ];
+    $form['national_moderator_heading'] = [
+      '#type' => 'markup',
+      '#markup' => '<div class="dhcr-user-edit-form__national-moderator">'
+        . '<h3>' . $this->t('National Moderator List') . '</h3>'
+        . '<p class="dhcr-user-edit-form__national-note">' . $this->t('Note: Please first check/update the following fields: First Name, Last Name, Email Address, Institution, Country (based on institution), About, Profile Photo. And then also check the box below when assigning moderator rights.') . '</p>'
+        . '</div>',
+      '#weight' => -81,
+    ];
+    $form['national_moderator_list'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Show this user in the National Moderators List'),
+      '#default_value' => (int) $legacy['national_moderator_list'],
+      '#weight' => -80,
+      '#attributes' => [
+        'class' => ['dhcr-user-edit-form__national-checkbox'],
+      ],
+    ];
 
     $form['actions']['submit']['#value'] = $this->t('Update User');
     return $form;
@@ -208,6 +225,7 @@ final class DhcrUserEditForm extends FormBase {
     $is_admin = (int) ((bool) $form_state->getValue('is_admin'));
     $user_admin = (int) ((bool) $form_state->getValue('user_admin'));
     $user_role_id = (int) $form_state->getValue('user_role_id');
+    $national_moderator_list = (int) ((bool) $form_state->getValue('national_moderator_list'));
 
     $user->setEmail($mail);
     $this->applyLegacyRoles($user, $user_role_id, $is_admin, $user_admin);
@@ -238,6 +256,7 @@ final class DhcrUserEditForm extends FormBase {
     $this->userData->set($module, $uid, 'legacy_is_admin', $is_admin);
     $this->userData->set($module, $uid, 'legacy_user_admin', $user_admin);
     $this->userData->set($module, $uid, 'legacy_user_role_id', $user_role_id);
+    $this->userData->set($module, $uid, 'legacy_national_moderator_list', $national_moderator_list);
 
     $this->messenger()->addStatus($this->t('User updated.'));
     $form_state->setRedirect('dhcr_backend.all_users');
@@ -295,6 +314,7 @@ final class DhcrUserEditForm extends FormBase {
       'about' => (string) ($this->userData->get($module, $uid, 'legacy_about') ?? ''),
       'is_admin' => (int) ($this->userData->get($module, $uid, 'legacy_is_admin') ?? ($user->hasRole('administrator') ? 1 : 0)),
       'user_admin' => (int) ($this->userData->get($module, $uid, 'legacy_user_admin') ?? 0),
+      'national_moderator_list' => (int) ($this->userData->get($module, $uid, 'legacy_national_moderator_list') ?? 0),
       'user_role_id' => $role_id,
       'country_id' => (int) ($this->userData->get($module, $uid, 'legacy_country_id') ?? 0),
     ];

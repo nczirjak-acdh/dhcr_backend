@@ -2,6 +2,7 @@
   <h2 class="dhcr-external-resources-list__heading">{{ 'External Resources'|t }}{{ title_suffix }}</h2>
 
   <a class="dhcr-external-resources-list__add" href="{{ add_url }}">{{ 'Add External Resource'|t }}</a>
+  <p class="dhcr-external-resources-list__hint">{{ 'Hint: Click on the course name, to see an overview of all external resources for that course.'|t }}</p>
 
   {% if rows|length > 0 %}
     <div class="dhcr-table-search">
@@ -11,28 +12,33 @@
       <thead>
         <tr>
           <th class="sortable{{ sort_links.id.active ? ' is-active is-' ~ sort_links.id.direction : '' }}">{{ sort_links.id.text|raw }}</th>
+          <th class="sortable{{ sort_links.visible.active ? ' is-active is-' ~ sort_links.visible.direction : '' }}">{{ sort_links.visible.text|raw }}</th>
           <th class="sortable{{ sort_links.title.active ? ' is-active is-' ~ sort_links.title.direction : '' }}">{{ sort_links.title.text|raw }}</th>
           <th class="sortable{{ sort_links.course.active ? ' is-active is-' ~ sort_links.course.direction : '' }}">{{ sort_links.course.text|raw }}</th>
           <th class="sortable{{ sort_links.type.active ? ' is-active is-' ~ sort_links.type.direction : '' }}">{{ sort_links.type.text|raw }}</th>
-          <th class="sortable{{ sort_links.visible.active ? ' is-active is-' ~ sort_links.visible.direction : '' }}">{{ sort_links.visible.text|raw }}</th>
-          <th>{{ 'Url'|t }}</th>
-          <th>{{ 'Action'|t }}</th>
+          <th class="sortable{{ sort_links.created.active ? ' is-active is-' ~ sort_links.created.direction : '' }}">{{ sort_links.created.text|raw }}</th>
+          <th class="sortable{{ sort_links.changed.active ? ' is-active is-' ~ sort_links.changed.direction : '' }}">{{ sort_links.changed.text|raw }}</th>
         </tr>
       </thead>
       <tbody>
         {% for row in rows %}
           <tr>
             <td>{{ row.id }}</td>
+            <td class="dhcr-external-resources-list__published {{ row.visible_class }}">
+              <span class="dhcr-external-resources-list__published-icon" aria-hidden="true"></span>
+              {{ row.visible }}
+            </td>
             <td>{{ row.title }}</td>
-            <td>{{ row.course }}</td>
-            <td>{{ row.type }}</td>
-            <td>{{ row.visible }}</td>
             <td>
-              {% if row.resource_url %}
-                <a href="{{ row.resource_url }}">{{ 'Link'|t }}</a>
+              {% if row.course_url %}
+                <a href="{{ row.course_url }}">{{ row.course }}</a>
+              {% else %}
+                {{ row.course }}
               {% endif %}
             </td>
-            <td><a href="{{ row.edit_url }}">{{ 'Edit'|t }}</a></td>
+            <td>{{ row.type }}</td>
+            <td>{{ row.created }}</td>
+            <td>{{ row.changed }}</td>
           </tr>
         {% endfor %}
       </tbody>

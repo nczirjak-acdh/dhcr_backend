@@ -129,7 +129,7 @@ dhcr_backend.statistics_app_info:
 dhcr_backend.reinvite_user:
   path: '/admin/content/dhcr/contributor-network/invitations/{dhcr_user_invitation}/reinvite'
   defaults:
-    _controller: '\Drupal\dhcr_backend\Controller\DhcrContributorController::reinviteUser'
+    _form: '\Drupal\dhcr_backend\Form\DhcrReinviteUserForm'
     _title: 'Reinvite User'
   requirements:
     _permission: 'administer_dhcr_backend'
