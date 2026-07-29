@@ -292,3 +292,45 @@ function dhcr_backend_post_update_ensure_dhcr_user_roles(array &$sandbox): void 
     $role->save();
   }
 }
+
+/**
+ * Installs institution base fields missing from older DHCR backend schemas.
+ */
+function dhcr_backend_post_update_install_missing_institution_base_fields(array &$sandbox): void {
+  $entity_type_id = 'dhcr_institution';
+  $field_names = ['description', 'lon', 'lat'];
+
+  $entity_type_manager = \Drupal::entityTypeManager();
+  $entity_type = $entity_type_manager->getDefinition($entity_type_id, FALSE);
+  if (!$entity_type) {
+    return;
+  }
+
+  $schema = \Drupal::database()->schema();
+  $base_table = (string) $entity_type->getBaseTable();
+  if ($base_table === '' || !$schema->tableExists($base_table)) {
+    return;
+  }
+
+  $field_manager = \Drupal::service('entity_field.manager');
+  $installed_repository = \Drupal::service('entity.last_installed_schema.repository');
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+
+  $definitions = $field_manager->getFieldStorageDefinitions($entity_type_id);
+  $installed_definitions = $installed_repository->getLastInstalledFieldStorageDefinitions($entity_type_id);
+
+  foreach ($field_names as $field_name) {
+    if (!isset($definitions[$field_name]) || isset($installed_definitions[$field_name])) {
+      continue;
+    }
+
+    $definition_update_manager->installFieldStorageDefinition(
+      $field_name,
+      $entity_type_id,
+      'dhcr_backend',
+      $definitions[$field_name]
+    );
+  }
+
+  $field_manager->clearCachedFieldDefinitions();
+}

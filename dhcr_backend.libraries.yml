@@ -146,3 +146,7 @@ admin_faq_question:
   css:
     theme:
       css/dhcr_faq_question_admin.css: {}
+  dependencies:
+    - dhcr_backend/admin_dashboard
+    - dhcr_backend/admin_table_search
+    - core/drupal.tabledrag

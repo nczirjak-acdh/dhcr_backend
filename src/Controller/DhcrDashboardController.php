@@ -214,7 +214,7 @@ final class DhcrDashboardController extends ControllerBase {
       array_unshift($cards, [
         'title' => (string) $this->t('Contributor FAQ'),
         'icon' => 'fas fa-graduation-cap',
-        'url' => $this->routeOrFallback('entity.dhcr_faq_question.collection'),
+        'url' => $this->routeOrFallback('dhcr_backend.faq_questions_contributor'),
       ]);
     }
 
@@ -263,7 +263,7 @@ final class DhcrDashboardController extends ControllerBase {
     return [
       '#theme' => 'dhcr_moderator_faq',
       '#items' => $items,
-      '#edit_url' => $this->routeOrFallback('entity.dhcr_faq_question.collection'),
+      '#edit_url' => $this->routeOrFallback('dhcr_backend.faq_questions_moderator'),
       '#attached' => [
         'library' => ['dhcr_backend/admin_help'],
       ],

@@ -8,8 +8,15 @@ use Drupal\Core\Form\FormStateInterface;
 
 final class DhcrFaqQuestionForm extends DhcrContentEntityForm {
 
+  private const CATEGORY_ROUTES = [
+    'public' => 'dhcr_backend.faq_questions_public',
+    'contributor' => 'dhcr_backend.faq_questions_contributor',
+    'moderator' => 'dhcr_backend.faq_questions_moderator',
+  ];
+
   public function form(array $form, FormStateInterface $form_state): array {
     $form = parent::form($form, $form_state);
+    $entity = $this->getEntity();
 
     $form['#attached']['library'][] = 'dhcr_backend/admin_faq_question';
     $form['#attributes']['class'][] = 'dhcr-faq-question-form';
@@ -28,6 +35,13 @@ final class DhcrFaqQuestionForm extends DhcrContentEntityForm {
       $form['answer']['widget'][0]['value']['#title'] = $this->t('Answer');
     }
 
+    if ($entity->isNew() && isset($form['category']['widget'][0]['value'])) {
+      $category = (string) \Drupal::request()->query->get('category', '');
+      if (isset(self::CATEGORY_ROUTES[$category])) {
+        $form['category']['widget'][0]['value']['#default_value'] = $category;
+      }
+    }
+
     if (isset($form['link_url']['widget'][0]['uri'])) {
       $form['link_url']['widget'][0]['uri']['#title'] = $this->t('Link URL');
     }
@@ -42,5 +56,16 @@ final class DhcrFaqQuestionForm extends DhcrContentEntityForm {
       $actions['submit']['#attributes']['class'][] = 'button--dhcr-outline';
     }
     return $actions;
+  }
+
+  public function save(array $form, FormStateInterface $form_state): int {
+    $status = parent::save($form, $form_state);
+
+    $category = (string) ($this->getEntity()->get('category')->value ?? '');
+    if (isset(self::CATEGORY_ROUTES[$category])) {
+      $form_state->setRedirect(self::CATEGORY_ROUTES[$category]);
+    }
+
+    return $status;
   }
 }

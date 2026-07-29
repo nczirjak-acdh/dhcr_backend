@@ -19,8 +19,9 @@
         return;
       }
 
-      var lonInput = document.querySelector('input[name="lon[0][value]"]');
-      var latInput = document.querySelector('input[name="lat[0][value]"]');
+      var form = container.closest('form') || document;
+      var lonInput = form.querySelector('input[name="lon[0][value]"], input[data-drupal-selector="edit-lon-0-value"]');
+      var latInput = form.querySelector('input[name="lat[0][value]"], input[data-drupal-selector="edit-lat-0-value"]');
 
       if (lonInput && lonInput.value !== '') {
         initialLon = Number(lonInput.value);
@@ -43,15 +44,31 @@
         .setLngLat([initialLon, initialLat])
         .addTo(map);
 
-      marker.on('dragend', function onDragEnd() {
-        var lngLat = marker.getLngLat();
+      function updateCoordinateInputs(lngLat) {
         if (lonInput) {
           lonInput.value = String(lngLat.lng);
         }
         if (latInput) {
           latInput.value = String(lngLat.lat);
         }
+      }
+
+      updateCoordinateInputs(marker.getLngLat());
+
+      marker.on('dragend', function onDragEnd() {
+        updateCoordinateInputs(marker.getLngLat());
       });
+
+      map.on('click', function onMapClick(event) {
+        marker.setLngLat(event.lngLat);
+        updateCoordinateInputs(event.lngLat);
+      });
+
+      if (form.addEventListener) {
+        form.addEventListener('submit', function onSubmit() {
+          updateCoordinateInputs(marker.getLngLat());
+        });
+      }
 
       container.dataset.mapInitialized = '1';
     }

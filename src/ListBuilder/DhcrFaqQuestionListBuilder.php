@@ -11,7 +11,43 @@ use Drupal\Core\Url;
 final class DhcrFaqQuestionListBuilder extends EntityListBuilder {
   use DhcrSortableRowsTrait;
 
+  private ?string $category = NULL;
+
+  private string $categoryTitle = '';
+
+  public function setCategory(string $category, string $title): self {
+    $this->category = $category;
+    $this->categoryTitle = $title;
+    return $this;
+  }
+
   public function render(): array {
+    if ($this->category === NULL) {
+      return [
+        '#theme' => 'dhcr_faq_questions_index',
+        '#cards' => [
+          [
+            'title' => (string) $this->t('Public Questions'),
+            'url' => Url::fromRoute('dhcr_backend.faq_questions_public')->toString(),
+          ],
+          [
+            'title' => (string) $this->t('Contributor Questions'),
+            'url' => Url::fromRoute('dhcr_backend.faq_questions_contributor')->toString(),
+          ],
+          [
+            'title' => (string) $this->t('Moderator Questions'),
+            'url' => Url::fromRoute('dhcr_backend.faq_questions_moderator')->toString(),
+          ],
+        ],
+        '#attached' => [
+          'library' => ['dhcr_backend/admin_faq_question'],
+        ],
+        '#cache' => [
+          'tags' => $this->entityType->getListCacheTags(),
+        ],
+      ];
+    }
+
     $rows = [];
     foreach ($this->storage->loadMultiple($this->getEntityIds()) as $entity) {
       $rows[] = $this->buildRow($entity);
@@ -26,16 +62,18 @@ final class DhcrFaqQuestionListBuilder extends EntityListBuilder {
 
     return [
       '#theme' => 'dhcr_faq_questions_list',
-      '#add_url' => Url::fromRoute('entity.dhcr_faq_question.add_form')->toString(),
+      '#title' => $this->categoryTitle,
+      '#add_url' => Url::fromRoute('entity.dhcr_faq_question.add_form', [], [
+        'query' => ['category' => $this->category],
+      ])->toString(),
       '#sort_links' => $this->buildSortLinks([
         'id' => (string) $this->t('Id'),
-        'category' => (string) $this->t('Category'),
         'sort_order' => (string) $this->t('Sort order'),
         'question' => (string) $this->t('Question'),
         'published' => (string) $this->t('Published'),
-      ], 'category'),
+      ], 'sort_order'),
       '#rows' => $rows,
-      '#empty' => $this->t('No FAQ questions available.'),
+      '#empty' => $this->t('No @category available.', ['@category' => mb_strtolower($this->categoryTitle)]),
       '#attached' => [
         'library' => ['dhcr_backend/admin_faq_question'],
       ],
@@ -46,15 +84,17 @@ final class DhcrFaqQuestionListBuilder extends EntityListBuilder {
   }
 
   protected function getEntityIds(): array {
-    return array_values(
-      $this->getStorage()
-        ->getQuery()
-        ->accessCheck(FALSE)
-        ->sort('category', 'ASC')
-        ->sort('sort_order', 'ASC')
-        ->sort('id', 'ASC')
-        ->execute()
-    );
+    $query = $this->getStorage()
+      ->getQuery()
+      ->accessCheck(FALSE)
+      ->sort('sort_order', 'ASC')
+      ->sort('id', 'ASC');
+
+    if ($this->category !== NULL) {
+      $query->condition('category', $this->category);
+    }
+
+    return array_values($query->execute());
   }
 
   public function buildRow(EntityInterface $entity): array {

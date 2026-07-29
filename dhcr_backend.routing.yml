@@ -22,6 +22,41 @@ dhcr_backend.category_lists:
   requirements:
     _permission: 'administer_dhcr_global_settings'
 
+dhcr_backend.faq_questions_public:
+  path: '/admin/content/dhcr/faq-questions/public'
+  defaults:
+    _controller: '\Drupal\dhcr_backend\Controller\DhcrFaqQuestionController::categoryList'
+    _title: 'Public Questions'
+    category: 'public'
+  requirements:
+    _permission: 'administer_dhcr_global_settings'
+
+dhcr_backend.faq_questions_contributor:
+  path: '/admin/content/dhcr/faq-questions/contributor'
+  defaults:
+    _controller: '\Drupal\dhcr_backend\Controller\DhcrFaqQuestionController::categoryList'
+    _title: 'Contributor Questions'
+    category: 'contributor'
+  requirements:
+    _permission: 'administer_dhcr_global_settings'
+
+dhcr_backend.faq_questions_moderator:
+  path: '/admin/content/dhcr/faq-questions/moderator'
+  defaults:
+    _controller: '\Drupal\dhcr_backend\Controller\DhcrFaqQuestionController::categoryList'
+    _title: 'Moderator Questions'
+    category: 'moderator'
+  requirements:
+    _permission: 'administer_dhcr_global_settings'
+
+dhcr_backend.faq_question_view:
+  path: '/admin/content/dhcr/faq-questions/{dhcr_faq_question}/view'
+  defaults:
+    _controller: '\Drupal\dhcr_backend\Controller\DhcrFaqQuestionController::view'
+    _title: 'FAQ Question Details'
+  requirements:
+    _permission: 'administer_dhcr_global_settings'
+
 dhcr_backend.help:
   path: '/admin/content/dhcr/help'
   defaults:

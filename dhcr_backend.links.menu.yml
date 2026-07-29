@@ -107,11 +107,35 @@ dhcr_backend.duration_units_add:
   parent: dhcr_backend.duration_units
   weight: 1
 
+dhcr_backend.faq_questions:
+  title: 'FAQ Questions'
+  route_name: entity.dhcr_faq_question.collection
+  parent: dhcr_backend.admin
+  weight: 8
+
+dhcr_backend.faq_questions_public:
+  title: 'Public Questions'
+  route_name: dhcr_backend.faq_questions_public
+  parent: dhcr_backend.faq_questions
+  weight: 1
+
+dhcr_backend.faq_questions_contributor:
+  title: 'Contributor Questions'
+  route_name: dhcr_backend.faq_questions_contributor
+  parent: dhcr_backend.faq_questions
+  weight: 2
+
+dhcr_backend.faq_questions_moderator:
+  title: 'Moderator Questions'
+  route_name: dhcr_backend.faq_questions_moderator
+  parent: dhcr_backend.faq_questions
+  weight: 3
+
 dhcr_backend.statistics:
   title: 'Statistics'
   route_name: dhcr_backend.statistics
   parent: dhcr_backend.admin
-  weight: 8
+  weight: 9
 
 dhcr_backend.statistics_summary:
   title: 'Summary statistics'

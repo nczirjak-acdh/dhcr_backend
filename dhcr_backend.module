@@ -191,12 +191,33 @@ function dhcr_backend_theme(): array {
     ],
     'dhcr_faq_questions_list' => [
       'variables' => [
+        'title' => '',
         'add_url' => '',
         'sort_links' => [],
         'rows' => [],
         'empty' => '',
       ],
       'template' => 'dhcr-faq-questions-list',
+      'path' => $templates_path . '/category-lists',
+    ],
+    'dhcr_faq_questions_index' => [
+      'variables' => [
+        'cards' => [],
+      ],
+      'template' => 'dhcr-faq-questions-index',
+      'path' => $templates_path . '/category-lists',
+    ],
+    'dhcr_faq_question_details' => [
+      'variables' => [
+        'title' => '',
+        'edit_url' => '',
+        'category' => '',
+        'published' => FALSE,
+        'answer' => NULL,
+        'link_title' => '',
+        'link_url' => '',
+      ],
+      'template' => 'dhcr-faq-question-details',
       'path' => $templates_path . '/category-lists',
     ],
     'dhcr_account_approval' => [

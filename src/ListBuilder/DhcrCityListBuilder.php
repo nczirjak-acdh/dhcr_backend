@@ -11,6 +11,13 @@ use Drupal\Core\Url;
 final class DhcrCityListBuilder extends EntityListBuilder {
   use DhcrSortableRowsTrait;
 
+  /**
+   * The city overview uses client-side search, so it must load all cities.
+   *
+   * @var false
+   */
+  protected $limit = FALSE;
+
   public function render(): array {
     $rows = [];
     foreach ($this->load() as $entity) {

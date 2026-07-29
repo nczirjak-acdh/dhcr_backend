@@ -25,13 +25,35 @@
 .dhcr-external-resources-list,
 .dhcr-external-resource-form,
 .dhcr-users-view,
-.dhcr-invite-user-form {
+.dhcr-invite-user-form,
+.dhcr-user-details {
   font-size: 0.8rem;
 }
 
 form.dhcr-backend-form,
 form[class^="dhcr-backend-"],
-form[class*=" dhcr-backend-"] {
+form[class*=" dhcr-backend-"],
+.dhcr-dashboard,
+.dhcr-category-lists,
+.dhcr-courses-admin,
+.dhcr-contributor-network,
+.dhcr-needs-attention,
+.dhcr-account-approval,
+.dhcr-statistics,
+.dhcr-summary-stats,
+.dhcr-statistics-placeholder,
+.dhcr-course-stats,
+.dhcr-user-stats,
+.dhcr-all-courses,
+.dhcr-translations-list,
+.dhcr-languages-list,
+.dhcr-cities-list,
+.dhcr-institutions-list,
+.dhcr-countries-list,
+.dhcr-faq-questions-list,
+.dhcr-external-resources-list,
+.dhcr-users-view,
+.dhcr-user-details {
   border: 2px solid #b3b8be;
   box-sizing: border-box;
   margin: 24px;

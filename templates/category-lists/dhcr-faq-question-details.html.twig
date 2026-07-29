@@ -1,0 +1,42 @@
+<div class="dhcr-faq-question-details">
+  <h2 class="dhcr-faq-question-details__heading">
+    <span class="dhcr-faq-question-details__icon" aria-hidden="true"><i class="fas fa-eye"></i></span>
+    {{ 'FAQ Question Details'|t }}
+  </h2>
+
+  <a class="dhcr-faq-question-details__edit" href="{{ edit_url }}">{{ 'Edit FAQ Question'|t }}</a>
+
+  <h3 class="dhcr-faq-question-details__question">{{ title }}</h3>
+
+  <dl class="dhcr-faq-question-details__list">
+    <div class="dhcr-faq-question-details__row">
+      <dt>{{ 'Category'|t }}</dt>
+      <dd>{{ category }}</dd>
+    </div>
+
+    <div class="dhcr-faq-question-details__row">
+      <dt>{{ 'Published'|t }}</dt>
+      <dd class="{{ published ? 'is-yes' : 'is-no' }}">
+        {% if published %}
+          <i class="fas fa-check" aria-hidden="true"></i>
+          <span class="visually-hidden">{{ 'Yes'|t }}</span>
+        {% else %}
+          <i class="fas fa-times" aria-hidden="true"></i>
+          <span class="visually-hidden">{{ 'No'|t }}</span>
+        {% endif %}
+      </dd>
+    </div>
+
+    <div class="dhcr-faq-question-details__row dhcr-faq-question-details__row--answer">
+      <dt>{{ 'Answer'|t }}</dt>
+      <dd>{{ answer }}</dd>
+    </div>
+
+    {% if link_url %}
+      <div class="dhcr-faq-question-details__row">
+        <dt>{{ 'Link'|t }}</dt>
+        <dd><a href="{{ link_url }}">{{ link_title ?: link_url }}</a></dd>
+      </div>
+    {% endif %}
+  </dl>
+</div>

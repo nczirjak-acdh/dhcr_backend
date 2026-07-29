@@ -11,6 +11,13 @@ use Drupal\Core\Url;
 final class DhcrCountryListBuilder extends EntityListBuilder {
   use DhcrSortableRowsTrait;
 
+  /**
+   * The country overview uses client-side search, so it must load all rows.
+   *
+   * @var false
+   */
+  protected $limit = FALSE;
+
   public function render(): array {
     $rows = [];
     foreach ($this->load() as $entity) {
