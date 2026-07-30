@@ -91,7 +91,7 @@ final class DhcrDashboardController extends ControllerBase {
     $current_user = $this->currentUser();
     $is_global_admin = $current_user->hasPermission('administer dhcr global settings');
     $all_courses = $this->countAdminVisibleCourses();
-    $my_courses = $this->countCourses(['uid' => (int) $current_user->id()]);
+    $my_courses = $this->countAdminVisibleCourses((int) $current_user->id());
     $external_resources = $this->countEntities('dhcr_external_resource');
 
     $cards = [
@@ -105,13 +105,13 @@ final class DhcrDashboardController extends ControllerBase {
         'title' => (string) $this->t('All Courses'),
         'icon' => 'fas fa-list-alt',
         'count' => $all_courses,
-        'url' => $this->routeOrFallback('entity.dhcr_course.collection'),
+        'url' => $this->routeOrFallback('dhcr_backend.courses_admin_all_courses'),
       ],
       [
         'title' => (string) $this->t('My Courses'),
         'icon' => 'fas fa-graduation-cap',
         'count' => $my_courses,
-        'url' => $this->routeOrFallback('entity.dhcr_course.collection'),
+        'url' => $this->routeOrFallback('dhcr_backend.courses_admin_my_courses'),
       ],
     ];
 
@@ -135,6 +135,39 @@ final class DhcrDashboardController extends ControllerBase {
         'library' => ['dhcr_backend/admin_courses'],
       ],
     ];
+  }
+
+  public function allCoursesAdmin(): array {
+    $entities = $this->loadAdminVisibleCourses();
+    $list_builder = $this->entityTypeManager()->getListBuilder('dhcr_course');
+
+    $build = $list_builder->buildRenderableFromEntities($entities, [
+      'heading' => (string) $this->t('All Courses'),
+      'icon' => 'list',
+      'empty' => (string) $this->t('No courses available.'),
+      'show_legend' => TRUE,
+    ]);
+    $build['#cache']['contexts'][] = 'url.query_args:sort';
+    $build['#cache']['contexts'][] = 'url.query_args:direction';
+
+    return $build;
+  }
+
+  public function myCoursesAdmin(): array {
+    $entities = $this->loadAdminVisibleCourses((int) $this->currentUser()->id());
+    $list_builder = $this->entityTypeManager()->getListBuilder('dhcr_course');
+
+    $build = $list_builder->buildRenderableFromEntities($entities, [
+      'heading' => (string) $this->t('My Courses'),
+      'icon' => 'list',
+      'empty' => (string) $this->t('No courses available.'),
+      'show_legend' => TRUE,
+    ]);
+    $build['#cache']['contexts'][] = 'user';
+    $build['#cache']['contexts'][] = 'url.query_args:sort';
+    $build['#cache']['contexts'][] = 'url.query_args:direction';
+
+    return $build;
   }
 
   public function categoryLists(): array {
@@ -201,7 +234,7 @@ final class DhcrDashboardController extends ControllerBase {
       [
         'title' => (string) $this->t('Users, Access and Workflows'),
         'icon' => 'fas fa-wrench',
-        'url' => $this->routeOrFallback('dhcr_backend.all_users'),
+        'url' => $this->routeOrFallback('dhcr_backend.help_users_access_workflows'),
       ],
       [
         'title' => (string) $this->t('Moderator FAQ'),
@@ -214,7 +247,7 @@ final class DhcrDashboardController extends ControllerBase {
       array_unshift($cards, [
         'title' => (string) $this->t('Contributor FAQ'),
         'icon' => 'fas fa-graduation-cap',
-        'url' => $this->routeOrFallback('dhcr_backend.faq_questions_contributor'),
+        'url' => $this->routeOrFallback('dhcr_backend.help_contributor_faq'),
       ]);
     }
 
@@ -496,16 +529,20 @@ final class DhcrDashboardController extends ControllerBase {
     ]);
   }
 
-  private function countAdminVisibleCourses(): int {
+  private function countAdminVisibleCourses(?int $owner_id = NULL): int {
     try {
-      return (int) $this->entityTypeManager()
+      $query = $this->entityTypeManager()
         ->getStorage('dhcr_course')
         ->getQuery()
         ->accessCheck(FALSE)
         ->condition('archived', 0)
-        ->condition('changed', DhcrMapConfig::getCourseArchiveDateCutoff(), '>')
-        ->count()
-        ->execute();
+        ->condition('changed', DhcrMapConfig::getCourseArchiveDateCutoff(), '>');
+
+      if ($owner_id !== NULL) {
+        $query->condition('uid', $owner_id);
+      }
+
+      return (int) $query->count()->execute();
     }
     catch (\Throwable) {
       return 0;
@@ -537,6 +574,26 @@ final class DhcrDashboardController extends ControllerBase {
       foreach ($conditions as $field => $value) {
         $query->condition($field, $value);
       }
+      $ids = $query->execute();
+      return $ids ? $storage->loadMultiple($ids) : [];
+    }
+    catch (\Throwable) {
+      return [];
+    }
+  }
+
+  private function loadAdminVisibleCourses(?int $owner_id = NULL): array {
+    try {
+      $storage = $this->entityTypeManager()->getStorage('dhcr_course');
+      $query = $storage->getQuery()
+        ->accessCheck(FALSE)
+        ->condition('archived', 0)
+        ->condition('changed', DhcrMapConfig::getCourseArchiveDateCutoff(), '>');
+
+      if ($owner_id !== NULL) {
+        $query->condition('uid', $owner_id);
+      }
+
       $ids = $query->execute();
       return $ids ? $storage->loadMultiple($ids) : [];
     }

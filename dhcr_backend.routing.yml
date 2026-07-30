@@ -14,6 +14,22 @@ dhcr_backend.courses_admin:
   requirements:
     _permission: 'administer_dhcr_backend'
 
+dhcr_backend.courses_admin_all_courses:
+  path: '/admin/content/dhcr/courses-admin/courses'
+  defaults:
+    _controller: '\Drupal\dhcr_backend\Controller\DhcrDashboardController::allCoursesAdmin'
+    _title: 'All Courses'
+  requirements:
+    _permission: 'administer_dhcr_backend'
+
+dhcr_backend.courses_admin_my_courses:
+  path: '/admin/content/dhcr/courses-admin/mycourses'
+  defaults:
+    _controller: '\Drupal\dhcr_backend\Controller\DhcrDashboardController::myCoursesAdmin'
+    _title: 'My Courses'
+  requirements:
+    _permission: 'administer_dhcr_backend'
+
 dhcr_backend.category_lists:
   path: '/admin/content/dhcr/category-lists'
   defaults:
@@ -72,6 +88,38 @@ dhcr_backend.help_moderator_faq:
     _title: 'Moderator FAQ'
   requirements:
     _permission: 'administer_dhcr_backend'
+
+dhcr_backend.help_users_access_workflows:
+  path: '/admin/content/dhcr/help/users-access-workflows'
+  defaults:
+    _controller: '\Drupal\dhcr_backend\Controller\DhcrHelpContentController::usersAccessWorkflows'
+    _title: 'Users, Access and Workflows'
+  requirements:
+    _permission: 'administer_dhcr_backend'
+
+dhcr_backend.help_users_access_workflows_edit:
+  path: '/admin/content/dhcr/help/users-access-workflows/edit'
+  defaults:
+    _form: '\Drupal\dhcr_backend\Form\DhcrUsersAccessWorkflowsContentForm'
+    _title: 'Edit Users, Access and Workflows'
+  requirements:
+    _permission: 'administer_dhcr_global_settings'
+
+dhcr_backend.help_contributor_faq:
+  path: '/admin/content/dhcr/help/contributor-faq'
+  defaults:
+    _controller: '\Drupal\dhcr_backend\Controller\DhcrFaqQuestionController::contributorContent'
+    _title: 'Contributor FAQ'
+  requirements:
+    _permission: 'administer_dhcr_backend'
+
+dhcr_backend.help_contributor_faq_edit:
+  path: '/admin/content/dhcr/help/contributor-faq/edit'
+  defaults:
+    _form: '\Drupal\dhcr_backend\Form\DhcrContributorFaqContentForm'
+    _title: 'Edit Contributor FAQ'
+  requirements:
+    _permission: 'administer_dhcr_global_settings'
 
 dhcr_backend.contributor_network:
   path: '/admin/content/dhcr/contributor-network'

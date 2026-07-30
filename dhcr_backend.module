@@ -63,6 +63,14 @@ function dhcr_backend_theme(): array {
       'template' => 'dhcr-moderator-faq',
       'path' => $templates_path . '/help',
     ],
+    'dhcr_help_content' => [
+      'variables' => [
+        'edit_url' => '',
+        'content' => NULL,
+      ],
+      'template' => 'dhcr-help-content',
+      'path' => $templates_path . '/help',
+    ],
     'dhcr_statistics_menu' => [
       'variables' => [
         'cards' => [],
@@ -218,6 +226,14 @@ function dhcr_backend_theme(): array {
         'link_url' => '',
       ],
       'template' => 'dhcr-faq-question-details',
+      'path' => $templates_path . '/category-lists',
+    ],
+    'dhcr_contributor_faq_content' => [
+      'variables' => [
+        'edit_url' => '',
+        'content' => NULL,
+      ],
+      'template' => 'dhcr-contributor-faq-content',
       'path' => $templates_path . '/category-lists',
     ],
     'dhcr_account_approval' => [

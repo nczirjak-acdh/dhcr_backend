@@ -2,6 +2,10 @@
   max-width: 980px;
 }
 
+.dhcr-help-content-form {
+  max-width: 1200px;
+}
+
 .dhcr-faq-content__heading {
   margin: 0 0 20px;
   color: #1f73b5;
@@ -26,6 +30,77 @@
 .dhcr-faq-content__edit-link a {
   color: #0068c9;
   text-decoration: none;
+}
+
+.dhcr-faq-content__edit-link .button--dhcr-outline,
+.dhcr-help-content-form .button--dhcr-outline {
+  border: 4px solid #1f73b5;
+  border-radius: 999px;
+  color: #1f73b5;
+  display: inline-block;
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin: 0 0 20px;
+  padding: 12px 28px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.dhcr-faq-content__body h2 {
+  align-items: center;
+  color: #1f73b5;
+  display: flex;
+  font-size: 1.9rem;
+  font-weight: 800;
+  gap: 12px;
+  margin: 0 0 20px;
+  text-transform: uppercase;
+}
+
+.dhcr-faq-content__body h3 {
+  color: #1f73b5;
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 30px 0 12px;
+}
+
+.dhcr-faq-content__body h4 {
+  color: #66707d;
+  font-weight: 700;
+  margin: 24px 0 10px;
+}
+
+.dhcr-faq-content__body p,
+.dhcr-faq-content__body li {
+  color: #66707d;
+  line-height: 1.55;
+}
+
+.dhcr-faq-content__body a {
+  color: #0068c9;
+  text-decoration: none;
+}
+
+.dhcr-faq-content__body .glyphicon-wrench::before {
+  content: "\f0ad";
+  display: inline-block;
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+}
+
+.dhcr-help-content-form label {
+  color: #1f73b5;
+  font-weight: 700;
+}
+
+.dhcr-help-content-form textarea,
+.dhcr-help-content-form select {
+  border: 2px solid #1f73b5;
+  border-radius: 9px;
+}
+
+.dhcr-help-content-form .filter-wrapper {
+  border-color: #b3b8be;
 }
 
 .dhcr-faq-content__contents-list {
