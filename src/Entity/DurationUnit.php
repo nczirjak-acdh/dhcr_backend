@@ -27,7 +27,7 @@ use Drupal\dhcr_backend\Entity\Traits\DhcrLabelTrait;
  *     "access" = "Drupal\dhcr_backend\Access\DhcrGenericAccessControlHandler"
  *   },
  *   base_table = "dhcr_duration_unit",
- *   admin_permission = "administer dhcr global settings",
+ *   admin_permission = "administer_dhcr_global_settings",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "name",

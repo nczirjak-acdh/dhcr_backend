@@ -21,6 +21,9 @@ final class DhcrInstitutionListBuilder extends EntityListBuilder {
   public function render(): array {
     $rows = [];
     foreach ($this->load() as $entity) {
+      if (!$entity->access('update')) {
+        continue;
+      }
       $rows[] = $this->buildRow($entity);
     }
     $rows = $this->sortRows($rows, [
@@ -45,6 +48,7 @@ final class DhcrInstitutionListBuilder extends EntityListBuilder {
         'library' => ['dhcr_backend/admin_institution'],
       ],
       '#cache' => [
+        'contexts' => ['user', 'user.permissions'],
         'tags' => $this->entityType->getListCacheTags(),
       ],
     ];

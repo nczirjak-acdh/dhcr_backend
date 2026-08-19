@@ -1,0 +1,35 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - dhcr_backend
+    - dhcr_logs
+    - system
+    - toolbar
+    - user
+id: cr_admin
+label: 'CR Administrator'
+weight: 4
+is_admin: false
+permissions:
+  - 'access administration pages'
+  - 'access content'
+  - 'access toolbar'
+  - 'access user profiles'
+  - 'administer dhcr logs'
+  - access_dhcr_contributor
+  - administer_dhcr_backend
+  - administer_dhcr_global_settings
+  - approve_dhcr_country_courses
+  - approve_dhcr_country_users
+  - create_dhcr_courses
+  - edit_own_dhcr_courses
+  - invite_dhcr_users
+  - manage_dhcr_country_master_data
+  - moderate_dhcr_country_courses
+  - moderate_dhcr_country_users
+  - unpublish_own_dhcr_courses
+  - view_dhcr_contributor_faq
+  - view_dhcr_moderator_faq
+  - view_dhcr_workflows
+  - view_own_dhcr_courses

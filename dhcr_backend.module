@@ -2,6 +2,93 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\user\UserInterface;
+
+/**
+ * Implements hook_user_login().
+ */
+function dhcr_backend_user_login(UserInterface $account): void {
+  // A successful login proves that the invited user has established a usable
+  // password, including after following a one-time password-setting link.
+  \Drupal::service('user.data')->set('dhcr_backend', (int) $account->id(), 'legacy_password_set', 1);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for personal profile settings.
+ */
+function dhcr_backend_form_user_form_alter(array &$form, FormStateInterface $form_state): void {
+  $account = $form_state->getFormObject()->getEntity();
+  if (!$account instanceof UserInterface || (int) $account->id() !== (int) \Drupal::currentUser()->id()) {
+    return;
+  }
+  if (!\Drupal::currentUser()->hasPermission('access_dhcr_contributor')) {
+    return;
+  }
+
+  $storage = \Drupal::entityTypeManager()->getStorage('dhcr_contributor_profile');
+  $ids = $storage->getQuery()->accessCheck(FALSE)->condition('user', (int) $account->id())->range(0, 1)->execute();
+  $profile = $ids ? $storage->load((int) reset($ids)) : NULL;
+  $user_data = \Drupal::service('user.data');
+
+  $form['dhcr_profile'] = [
+    '#type' => 'details',
+    '#title' => t('DHCR contributor profile'),
+    '#open' => TRUE,
+    '#tree' => TRUE,
+    '#weight' => 5,
+  ];
+  $form['dhcr_profile']['academic_title'] = [
+    '#type' => 'textfield',
+    '#title' => t('Title'),
+    '#default_value' => (string) ($profile?->get('academic_title')->value ?? ''),
+  ];
+  $form['dhcr_profile']['first_name'] = [
+    '#type' => 'textfield',
+    '#title' => t('First name'),
+    '#default_value' => (string) ($profile?->get('first_name')->value ?? ''),
+  ];
+  $form['dhcr_profile']['last_name'] = [
+    '#type' => 'textfield',
+    '#title' => t('Last name'),
+    '#default_value' => (string) ($profile?->get('last_name')->value ?? ''),
+  ];
+  $form['dhcr_profile']['mailing_list'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Subscribe to the DHCR contributor mailing list'),
+    '#default_value' => (int) ($user_data->get('dhcr_backend', (int) $account->id(), 'legacy_mail_list') ?? 0),
+  ];
+  $form['actions']['submit']['#submit'][] = 'dhcr_backend_user_profile_submit';
+}
+
+/**
+ * Saves the DHCR-specific fields added to the personal user form.
+ */
+function dhcr_backend_user_profile_submit(array &$form, FormStateInterface $form_state): void {
+  $account = $form_state->getFormObject()->getEntity();
+  if (!$account instanceof UserInterface || (int) $account->id() !== (int) \Drupal::currentUser()->id()) {
+    return;
+  }
+
+  $values = (array) $form_state->getValue('dhcr_profile', []);
+  $storage = \Drupal::entityTypeManager()->getStorage('dhcr_contributor_profile');
+  $ids = $storage->getQuery()->accessCheck(FALSE)->condition('user', (int) $account->id())->range(0, 1)->execute();
+  $profile = $ids ? $storage->load((int) reset($ids)) : $storage->create([
+    'user' => (int) $account->id(),
+    'name' => $account->getDisplayName(),
+    'email' => $account->getEmail(),
+    'enabled' => 1,
+  ]);
+  $profile->set('name', trim((string) ($values['first_name'] ?? '') . ' ' . (string) ($values['last_name'] ?? '')) ?: $account->getDisplayName());
+  $profile->set('email', $account->getEmail());
+  foreach (['academic_title', 'first_name', 'last_name'] as $field_name) {
+    $profile->set($field_name, (string) ($values[$field_name] ?? ''));
+  }
+  $profile->save();
+
+  \Drupal::service('user.data')->set('dhcr_backend', (int) $account->id(), 'legacy_mail_list', !empty($values['mailing_list']) ? 1 : 0);
+}
+
 /**
  * Implements hook_theme().
  */
@@ -318,5 +405,29 @@ function dhcr_backend_form_alter(array &$form, \Drupal\Core\Form\FormStateInterf
     str_starts_with($route_name, 'entity.dhcr_')
   ) {
     $form['#attributes']['class'][] = 'dhcr-backend-form';
+  }
+}
+
+/**
+ * Implements hook_mail().
+ */
+function dhcr_backend_mail(string $key, array &$message, array $params): void {
+  if ($key !== 'template') {
+    return;
+  }
+
+  $message['subject'] = (string) ($params['subject'] ?? '');
+  $message['body'][] = (string) ($params['body'] ?? '');
+
+  $from = trim((string) ($params['from'] ?? ''));
+  if ($from !== '') {
+    $message['from'] = $from;
+    $message['headers']['From'] = $from;
+  }
+  if (!empty($params['cc'])) {
+    $message['headers']['Cc'] = implode(', ', (array) $params['cc']);
+  }
+  if (!empty($params['bcc'])) {
+    $message['headers']['Bcc'] = implode(', ', (array) $params['bcc']);
   }
 }

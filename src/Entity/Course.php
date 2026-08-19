@@ -30,7 +30,7 @@ use Drupal\user\EntityOwnerTrait;
  *     "access" = "Drupal\dhcr_backend\Access\DhcrCourseAccessControlHandler"
  *   },
  *   base_table = "dhcr_course",
- *   admin_permission = "administer dhcr backend",
+ *   admin_permission = "access_dhcr_contributor",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "title",

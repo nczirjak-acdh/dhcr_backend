@@ -1,0 +1,53 @@
+dhcr_backend.email_templates:
+  type: config_object
+  label: 'DHCR email templates'
+  mapping:
+    subject_prefix:
+      type: string
+      label: 'Subject prefix'
+    sender:
+      type: email
+      label: 'Sender address'
+    reply_to:
+      type: email
+      label: 'Reply-to address'
+    default_cc:
+      type: string
+      label: 'Default CC addresses'
+    footer:
+      type: text
+      label: 'Shared footer'
+    templates:
+      type: mapping
+      label: 'Templates'
+      mapping:
+        welcome:
+          type: dhcr_backend.email_template
+        email_confirmation:
+          type: dhcr_backend.email_template
+        password_reset:
+          type: dhcr_backend.email_template
+        account_approval_request:
+          type: dhcr_backend.email_template
+        course_approval_request:
+          type: dhcr_backend.email_template
+        course_reminder:
+          type: dhcr_backend.email_template
+        review_reminder:
+          type: dhcr_backend.email_template
+        test:
+          type: dhcr_backend.email_template
+
+dhcr_backend.email_template:
+  type: mapping
+  label: 'DHCR email template'
+  mapping:
+    enabled:
+      type: boolean
+      label: 'Enabled'
+    subject:
+      type: label
+      label: 'Subject'
+    body:
+      type: text
+      label: 'Body'

@@ -5,9 +5,21 @@ declare(strict_types=1);
 namespace Drupal\dhcr_backend\Form;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
+use Drupal\dhcr_backend\Access\DhcrCountryScope;
+use Drupal\dhcr_backend\Service\DhcrMailManager;
 use Drupal\dhcr_backend\Utility\DhcrMapConfig;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 final class DhcrCourseForm extends DhcrContentEntityForm {
+
+  private DhcrMailManager $dhcrMailManager;
+
+  public static function create(ContainerInterface $container): static {
+    $instance = parent::create($container);
+    $instance->dhcrMailManager = $container->get('dhcr_backend.mail_manager');
+    return $instance;
+  }
 
   private const START_DATE_ELEMENT = 'dhcr_start_date_calendar';
 
@@ -126,6 +138,28 @@ final class DhcrCourseForm extends DhcrContentEntityForm {
 
     $form['active']['#description'] = $this->t('Check this box if your course is ready to be published in the registry.');
 
+    $account = $this->currentUser();
+    if (!$account->hasPermission('administer_dhcr_global_settings')) {
+      // Ownership and approval state are controlled by the workflow, not by
+      // contributors editing a course form.
+      foreach (['uid', 'approved', 'archived', 'archived_at', 'last_reminder_sent'] as $field_name) {
+        if (isset($form[$field_name])) {
+          $form[$field_name]['#access'] = FALSE;
+        }
+      }
+      if (!$account->hasPermission('unpublish_own_dhcr_courses') && isset($form['active'])) {
+        $form['active']['#access'] = FALSE;
+      }
+    }
+
+    if ($account->hasPermission('moderate_dhcr_country_courses') && !$account->hasPermission('administer_dhcr_global_settings')) {
+      $country_id = DhcrCountryScope::countryId($account);
+      if ($country_id > 0 && isset($form['country']['widget'][0]['target_id'])) {
+        $form['country']['widget'][0]['target_id']['#default_value'] = $country_id;
+        $form['country']['widget'][0]['target_id']['#disabled'] = TRUE;
+      }
+    }
+
     return $form;
   }
 
@@ -171,7 +205,33 @@ final class DhcrCourseForm extends DhcrContentEntityForm {
   }
 
   public function save(array $form, FormStateInterface $form_state): int {
+    $is_new = $this->getEntity()->isNew();
     $status = parent::save($form, $form_state);
+
+    $course = $this->getEntity();
+    if ($is_new && !(bool) $course->get('approved')->value) {
+      $country_id = (int) ($course->get('country')->target_id ?? 0);
+      if ($country_id === 0) {
+        $country_id = DhcrCountryScope::entityCountryId($course);
+      }
+      $sent = $this->dhcrMailManager->sendTemplate(
+        'course_approval_request',
+        $this->dhcrMailManager->moderatorEmails($country_id),
+        [
+          'course_name' => (string) $course->label(),
+          'course_type' => (string) ($course->get('course_type')->entity?->label() ?? ''),
+          'institution' => (string) ($course->get('institution')->entity?->label() ?? ''),
+          'approval_url' => Url::fromRoute('dhcr_backend.course_approval', [], ['absolute' => TRUE])->toString(),
+        ],
+        [
+          'related_course' => (int) $course->id(),
+          'related_user' => (int) $course->getOwnerId(),
+        ],
+      );
+      if (!$sent) {
+        $this->messenger()->addWarning($this->t('The course was saved, but its approval notification could not be sent.'));
+      }
+    }
 
     $trigger = (string) ($form_state->getTriggeringElement()['#name'] ?? '');
     if ($trigger === 'submit_add_resources') {

@@ -334,3 +334,129 @@ function dhcr_backend_post_update_install_missing_institution_base_fields(array 
 
   $field_manager->clearCachedFieldDefinitions();
 }
+
+/**
+ * Installs the contributor/moderator permission model on existing sites.
+ */
+function dhcr_backend_post_update_install_role_permissions(array &$sandbox): void {
+  $definitions = [
+    'contributor' => [
+      'label' => 'Course contributor',
+      'permissions' => [
+        'access content', 'access user profiles', 'access_dhcr_contributor',
+        'create_dhcr_courses', 'edit_own_dhcr_courses',
+        'unpublish_own_dhcr_courses', 'view_dhcr_contributor_faq',
+        'view_own_dhcr_courses',
+      ],
+    ],
+    'moderator' => [
+      'label' => 'National Moderator',
+      'permissions' => [
+        'access content', 'access user profiles', 'access_dhcr_contributor',
+        'administer_dhcr_backend', 'approve_dhcr_country_courses',
+        'approve_dhcr_country_users', 'create_dhcr_courses',
+        'edit_own_dhcr_courses', 'invite_dhcr_users',
+        'manage_dhcr_country_master_data', 'moderate_dhcr_country_courses',
+        'moderate_dhcr_country_users', 'unpublish_own_dhcr_courses',
+        'view_dhcr_contributor_faq', 'view_dhcr_moderator_faq',
+        'view_dhcr_workflows', 'view_own_dhcr_courses',
+      ],
+    ],
+    'administrator' => [
+      'label' => 'Administrator',
+      'permissions' => ['administer_dhcr_global_settings'],
+    ],
+  ];
+
+  foreach ($definitions as $role_id => $definition) {
+    $role = \Drupal\user\Entity\Role::load($role_id) ?: \Drupal\user\Entity\Role::create([
+      'id' => $role_id,
+      'label' => $definition['label'],
+    ]);
+    $role->set('label', $definition['label']);
+    foreach (['administer dhcr backend', 'administer dhcr global settings'] as $obsolete_permission) {
+      if ($role->hasPermission($obsolete_permission)) {
+        $role->revokePermission($obsolete_permission);
+      }
+    }
+    foreach ($definition['permissions'] as $permission) {
+      if (!$role->hasPermission($permission)) {
+        $role->grantPermission($permission);
+      }
+    }
+    $role->save();
+  }
+}
+
+/**
+ * Corrects account-state metadata for users created by the invite form.
+ */
+function dhcr_backend_post_update_correct_invited_user_status(array &$sandbox): void {
+  $invitation_storage = \Drupal::entityTypeManager()->getStorage('dhcr_user_invitation');
+  $invitations = $invitation_storage->loadMultiple(
+    $invitation_storage->getQuery()->accessCheck(FALSE)->execute()
+  );
+  $user_data = \Drupal::service('user.data');
+
+  foreach ($invitations as $invitation) {
+    $uid = (int) ($invitation->get('user')->target_id ?? 0);
+    if ($uid <= 0) {
+      continue;
+    }
+    $user_data->set('dhcr_backend', $uid, 'legacy_email_verified', 1);
+    if ($user_data->get('dhcr_backend', $uid, 'legacy_password_set') === NULL) {
+      $user_data->set('dhcr_backend', $uid, 'legacy_password_set', 0);
+    }
+  }
+}
+
+/**
+ * Creates the DHCR-only CR Administrator role on existing sites.
+ */
+function dhcr_backend_post_update_create_cr_admin_role(array &$sandbox): void {
+  $role = \Drupal\user\Entity\Role::load('cr_admin') ?: \Drupal\user\Entity\Role::create([
+    'id' => 'cr_admin',
+    'label' => 'CR Administrator',
+    'weight' => 4,
+    'is_admin' => FALSE,
+  ]);
+  $role->set('label', 'CR Administrator');
+  $role->setIsAdmin(FALSE);
+
+  $permissions = [
+    'access administration pages', 'access content', 'access toolbar',
+    'access user profiles', 'administer dhcr logs',
+    'access_dhcr_contributor', 'administer_dhcr_backend',
+    'administer_dhcr_global_settings', 'approve_dhcr_country_courses',
+    'approve_dhcr_country_users', 'create_dhcr_courses',
+    'edit_own_dhcr_courses', 'invite_dhcr_users',
+    'manage_dhcr_country_master_data', 'moderate_dhcr_country_courses',
+    'moderate_dhcr_country_users', 'unpublish_own_dhcr_courses',
+    'view_dhcr_contributor_faq', 'view_dhcr_moderator_faq',
+    'view_dhcr_workflows', 'view_own_dhcr_courses',
+  ];
+  foreach ($permissions as $permission) {
+    if (!$role->hasPermission($permission)) {
+      $role->grantPermission($permission);
+    }
+  }
+  $role->save();
+}
+
+/**
+ * Installs the editable DHCR email template configuration.
+ */
+function dhcr_backend_post_update_install_email_templates(array &$sandbox): void {
+  $config_name = 'dhcr_backend.email_templates';
+  $editable = \Drupal::configFactory()->getEditable($config_name);
+  if (!$editable->isNew()) {
+    return;
+  }
+
+  $module_path = \Drupal::service('extension.list.module')->getPath('dhcr_backend');
+  $source = new \Drupal\Core\Config\FileStorage(DRUPAL_ROOT . '/' . $module_path . '/config/install');
+  $defaults = $source->read($config_name);
+  if (is_array($defaults)) {
+    $editable->setData($defaults)->save(TRUE);
+  }
+}

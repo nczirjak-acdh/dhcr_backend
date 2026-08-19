@@ -7,9 +7,11 @@ namespace Drupal\dhcr_backend\Form;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\dhcr_backend\Access\DhcrCountryScope;
 use Drupal\user\UserDataInterface;
 use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 final class DhcrUserEditForm extends FormBase {
 
@@ -33,13 +35,24 @@ final class DhcrUserEditForm extends FormBase {
       $form['message'] = ['#markup' => (string) $this->t('User not found.')];
       return $form;
     }
+    if (!$this->currentUser()->hasPermission('administer_dhcr_global_settings') && !DhcrCountryScope::matchesUser($this->currentUser(), $user)) {
+      throw new AccessDeniedHttpException('This user belongs to another country.');
+    }
+    if ($user->hasRole('administrator') && !$this->currentUser()->hasPermission('administer permissions')) {
+      throw new AccessDeniedHttpException('Only a Drupal administrator can edit another Drupal administrator.');
+    }
 
     $profile = $this->loadProfile((int) $user->id());
     $legacy = $this->loadLegacyUserData($user);
-    $institution_options = $this->institutionOptions();
-    $moderated_country = $this->countryLabel((int) $legacy['country_id']);
+    $institution_countries = [];
+    $institution_options = $this->institutionOptions($institution_countries);
+    $selected_institution_id = (int) ($profile?->get('institution')->target_id ?? 0);
+    $moderated_country = $institution_countries[$selected_institution_id] ?? '';
+    $is_global_admin = $this->currentUser()->hasPermission('administer_dhcr_global_settings');
+    $can_manage_drupal_admins = $this->currentUser()->hasPermission('administer permissions');
 
     $form['#attached']['library'][] = 'dhcr_backend/admin_user_edit';
+    $form['#attached']['drupalSettings']['dhcrUserEdit']['institutionCountries'] = $institution_countries;
     $form['#attributes']['class'][] = 'dhcr-user-edit-form';
 
     $form['user_id'] = [
@@ -106,6 +119,13 @@ final class DhcrUserEditForm extends FormBase {
       '#maxlength' => 255,
       '#weight' => -92,
     ];
+    $form['new_password'] = [
+      '#type' => 'password_confirm',
+      '#title' => $this->t('Set new password'),
+      '#required' => FALSE,
+      '#description' => $this->t('Leave empty to keep the current password.'),
+      '#weight' => -91.5,
+    ];
     $form['mail_list'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Contributor Mailing List Subscription'),
@@ -117,7 +137,7 @@ final class DhcrUserEditForm extends FormBase {
       '#title' => $this->t('Institution'),
       '#options' => $institution_options,
       '#empty_option' => $this->t('- None -'),
-      '#default_value' => (int) ($profile?->get('institution')->target_id ?? 0) ?: '',
+      '#default_value' => $selected_institution_id ?: '',
       '#weight' => -90,
     ];
     $form['about'] = [
@@ -132,6 +152,7 @@ final class DhcrUserEditForm extends FormBase {
       '#type' => 'markup',
       '#markup' => '<h3>' . $this->t('Administrator options') . '</h3>',
       '#weight' => -88,
+      '#access' => $can_manage_drupal_admins,
     ];
     $form['admin_note'] = [
       '#type' => 'markup',
@@ -139,40 +160,67 @@ final class DhcrUserEditForm extends FormBase {
         . $this->t('Note: Please always check or uncheck both options.')
         . '</strong></p>',
       '#weight' => -87,
+      '#access' => $can_manage_drupal_admins,
     ];
     $form['is_admin'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Administrator rights'),
       '#default_value' => (int) $legacy['is_admin'],
       '#weight' => -86,
+      '#access' => $can_manage_drupal_admins,
     ];
     $form['user_admin'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('User admin'),
       '#default_value' => (int) $legacy['user_admin'],
       '#weight' => -85,
+      '#access' => $can_manage_drupal_admins,
     ];
 
     $form['moderator_heading'] = [
       '#type' => 'markup',
       '#markup' => '<h3>' . $this->t('Moderator options') . '</h3>',
       '#weight' => -84,
+      '#access' => $is_global_admin,
     ];
     $form['user_role_id'] = [
       '#type' => 'select',
-      '#title' => $this->t('Moderator rights'),
-      '#options' => [
-        1 => $this->t('Old value - please change'),
-        2 => $this->t('Yes'),
-        3 => $this->t('No'),
+      '#title' => $this->t('DHCR role'),
+      '#options' => ($can_manage_drupal_admins ? [
+        1 => $this->t('Drupal Administrator (full site access)'),
+      ] : []) + [
+        2 => $this->t('National Moderator'),
+        3 => $this->t('Course Contributor'),
+        4 => $this->t('CR Administrator (DHCR only)'),
       ],
       '#default_value' => (int) $legacy['user_role_id'],
       '#weight' => -83,
+      '#access' => $is_global_admin,
     ];
     $form['moderated_country'] = [
-      '#type' => 'markup',
-      '#markup' => '<p>' . $this->t('Moderated country') . ': ' . ($moderated_country !== '' ? $moderated_country : '-') . '</p>',
+      '#type' => 'container',
       '#weight' => -82,
+      '#access' => $is_global_admin,
+      '#attributes' => [
+        'class' => ['dhcr-user-edit-form__moderated-country'],
+        'data-dhcr-moderated-country' => TRUE,
+        'hidden' => (int) $legacy['user_role_id'] !== 2,
+      ],
+    ];
+    $form['moderated_country']['label'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'span',
+      '#value' => $this->t('Moderated country') . ': ',
+      '#attributes' => ['class' => ['dhcr-user-edit-form__moderated-country-label']],
+    ];
+    $form['moderated_country']['value'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'span',
+      '#value' => $moderated_country !== '' ? $moderated_country : '-',
+      '#attributes' => [
+        'class' => ['dhcr-user-edit-form__moderated-country-value'],
+        'data-dhcr-moderated-country-value' => TRUE,
+      ],
     ];
     $form['national_moderator_heading'] = [
       '#type' => 'markup',
@@ -181,18 +229,29 @@ final class DhcrUserEditForm extends FormBase {
         . '<p class="dhcr-user-edit-form__national-note">' . $this->t('Note: Please first check/update the following fields: First Name, Last Name, Email Address, Institution, Country (based on institution), About, Profile Photo. And then also check the box below when assigning moderator rights.') . '</p>'
         . '</div>',
       '#weight' => -81,
+      '#access' => $is_global_admin,
     ];
     $form['national_moderator_list'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Show this user in the National Moderators List'),
       '#default_value' => (int) $legacy['national_moderator_list'],
       '#weight' => -80,
+      '#access' => $is_global_admin,
       '#attributes' => [
         'class' => ['dhcr-user-edit-form__national-checkbox'],
       ],
     ];
 
-    $form['actions']['submit']['#value'] = $this->t('Update User');
+    $form['actions'] = [
+      '#type' => 'actions',
+      '#weight' => 100,
+    ];
+    $form['actions']['submit'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Update User'),
+      '#button_type' => 'primary',
+    ];
+
     return $form;
   }
 
@@ -204,6 +263,9 @@ final class DhcrUserEditForm extends FormBase {
     $existing = user_load_by_mail($mail);
     if ($existing && (int) $existing->id() !== $uid) {
       $form_state->setErrorByName('email', $this->t('Email address is already used by another account.'));
+    }
+    if (!$this->currentUser()->hasPermission('administer permissions') && (int) $form_state->getValue('user_role_id') === 1) {
+      $form_state->setErrorByName('user_role_id', $this->t('You cannot assign the full Drupal Administrator role.'));
     }
   }
 
@@ -222,13 +284,26 @@ final class DhcrUserEditForm extends FormBase {
     $institution_id = (int) $form_state->getValue('institution_id');
     $about = (string) $form_state->getValue('about');
     $mail_list = (int) ((bool) $form_state->getValue('mail_list'));
-    $is_admin = (int) ((bool) $form_state->getValue('is_admin'));
-    $user_admin = (int) ((bool) $form_state->getValue('user_admin'));
-    $user_role_id = (int) $form_state->getValue('user_role_id');
-    $national_moderator_list = (int) ((bool) $form_state->getValue('national_moderator_list'));
+    $password_value = $form_state->getValue('new_password', '');
+    // Drupal 11 converts a validated password_confirm value from the original
+    // pass1/pass2 array into a single password string.
+    $new_password = is_array($password_value)
+      ? (string) ($password_value['pass1'] ?? '')
+      : (string) $password_value;
+    $is_global_admin = $this->currentUser()->hasPermission('administer_dhcr_global_settings');
+    $legacy = $this->loadLegacyUserData($user);
+    $is_admin = $is_global_admin ? (int) ((bool) $form_state->getValue('is_admin')) : (int) $legacy['is_admin'];
+    $user_admin = $is_global_admin ? (int) ((bool) $form_state->getValue('user_admin')) : (int) $legacy['user_admin'];
+    $user_role_id = $is_global_admin ? (int) $form_state->getValue('user_role_id') : (int) $legacy['user_role_id'];
+    $national_moderator_list = $is_global_admin ? (int) ((bool) $form_state->getValue('national_moderator_list')) : (int) $legacy['national_moderator_list'];
 
     $user->setEmail($mail);
-    $this->applyLegacyRoles($user, $user_role_id, $is_admin, $user_admin);
+    if ($new_password !== '') {
+      $user->setPassword($new_password);
+    }
+    if ($is_global_admin) {
+      $this->applyLegacyRoles($user, $user_role_id, $is_admin, $user_admin);
+    }
     $user->save();
 
     $profile_storage = $this->entityTypeManager->getStorage('dhcr_contributor_profile');
@@ -257,6 +332,12 @@ final class DhcrUserEditForm extends FormBase {
     $this->userData->set($module, $uid, 'legacy_user_admin', $user_admin);
     $this->userData->set($module, $uid, 'legacy_user_role_id', $user_role_id);
     $this->userData->set($module, $uid, 'legacy_national_moderator_list', $national_moderator_list);
+    $this->userData->set($module, $uid, 'legacy_country_id', $this->institutionCountryId($institution_id));
+    // Editing an address in this administrator-controlled form verifies it.
+    $this->userData->set($module, $uid, 'legacy_email_verified', 1);
+    if ($new_password !== '') {
+      $this->userData->set($module, $uid, 'legacy_password_set', 1);
+    }
 
     $this->messenger()->addStatus($this->t('User updated.'));
     $form_state->setRedirect('dhcr_backend.all_users');
@@ -275,20 +356,35 @@ final class DhcrUserEditForm extends FormBase {
     return $storage->load((int) reset($ids));
   }
 
-  private function institutionOptions(): array {
+  private function institutionOptions(array &$institution_countries = []): array {
     $storage = $this->entityTypeManager->getStorage('dhcr_institution');
-    $ids = $storage->getQuery()
+    $query = $storage->getQuery()
       ->accessCheck(FALSE)
-      ->sort('name', 'ASC')
-      ->execute();
+      ->sort('name', 'ASC');
+    if (!$this->currentUser()->hasPermission('administer_dhcr_global_settings')) {
+      $country_id = DhcrCountryScope::countryId($this->currentUser());
+      $query->condition('country', $country_id > 0 ? $country_id : -1);
+    }
+    $ids = $query->execute();
 
     $options = [];
     if ($ids) {
       foreach ($storage->loadMultiple($ids) as $institution) {
-        $options[(int) $institution->id()] = (string) $institution->label();
+        $institution_id = (int) $institution->id();
+        $options[$institution_id] = (string) $institution->label();
+        $country = $institution->get('country')->entity;
+        $institution_countries[$institution_id] = $country ? (string) $country->label() : '';
       }
     }
     return $options;
+  }
+
+  private function institutionCountryId(int $institution_id): int {
+    if ($institution_id <= 0) {
+      return 0;
+    }
+    $institution = $this->entityTypeManager->getStorage('dhcr_institution')->load($institution_id);
+    return (int) ($institution?->get('country')->target_id ?? 0);
   }
 
   private function loadLegacyUserData(UserInterface $user): array {
@@ -324,22 +420,17 @@ final class DhcrUserEditForm extends FormBase {
     if ($user->hasRole('administrator')) {
       return 1;
     }
+    if ($user->hasRole('cr_admin')) {
+      return 4;
+    }
     if ($user->hasRole('moderator')) {
       return 2;
     }
     return 3;
   }
 
-  private function countryLabel(int $country_id): string {
-    if ($country_id <= 0) {
-      return '';
-    }
-    $country = $this->entityTypeManager->getStorage('dhcr_country')->load($country_id);
-    return $country ? (string) $country->label() : '';
-  }
-
   private function applyLegacyRoles(UserInterface $user, int $user_role_id, int $is_admin, int $user_admin): void {
-    foreach (['content_editor', 'contributor', 'moderator', 'administrator'] as $managed_role) {
+    foreach (['content_editor', 'contributor', 'moderator', 'cr_admin', 'administrator'] as $managed_role) {
       if ($user->hasRole($managed_role)) {
         $user->removeRole($managed_role);
       }
@@ -347,6 +438,7 @@ final class DhcrUserEditForm extends FormBase {
 
     $admin_selected = ($user_role_id === 1) || $is_admin === 1 || $user_admin === 1;
     $moderator_selected = $user_role_id === 2;
+    $cr_admin_selected = $user_role_id === 4;
 
     if ($admin_selected) {
       $user->addRole('administrator');
@@ -354,7 +446,10 @@ final class DhcrUserEditForm extends FormBase {
     if ($moderator_selected) {
       $user->addRole('moderator');
     }
-    if (!$admin_selected && !$moderator_selected) {
+    if ($cr_admin_selected) {
+      $user->addRole('cr_admin');
+    }
+    if (!$admin_selected && !$moderator_selected && !$cr_admin_selected) {
       $user->addRole('contributor');
     }
   }

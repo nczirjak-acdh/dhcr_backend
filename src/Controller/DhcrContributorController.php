@@ -6,8 +6,10 @@ namespace Drupal\dhcr_backend\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
+use Drupal\dhcr_backend\Access\DhcrCountryScope;
 use Drupal\dhcr_backend\ListBuilder\DhcrSortableRowsTrait;
 use Drupal\user\UserInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 final class DhcrContributorController extends ControllerBase {
   use DhcrSortableRowsTrait;
@@ -34,7 +36,7 @@ final class DhcrContributorController extends ControllerBase {
       ],
     ];
 
-    if ($this->currentUser()->hasPermission('administer dhcr global settings')) {
+    if ($this->currentUser()->hasPermission('administer_dhcr_global_settings')) {
       $cards[] = [
         'title' => (string) $this->t('Moderators'),
         'icon' => 'fas fa-asterisk',
@@ -61,19 +63,31 @@ final class DhcrContributorController extends ControllerBase {
 
     foreach ($profiles as $profile) {
       $account = $profile->get('user')->entity;
+      if ($account?->hasRole('administrator') && !$this->currentUser()->hasPermission('administer permissions')) {
+        continue;
+      }
+      if ($account && !$this->currentUser()->hasPermission('administer_dhcr_global_settings') && !DhcrCountryScope::matchesUser($this->currentUser(), $account)) {
+        continue;
+      }
       $institution = $profile->get('institution')->entity;
       $user_view_url = $account ? Url::fromRoute('dhcr_backend.user_view', ['user' => (int) $account->id()])->toString() : '';
       $user_edit_url = $account ? Url::fromRoute('dhcr_backend.user_edit', ['user' => (int) $account->id()])->toString() : '';
+      $approved = $account ? (int) (\Drupal::service('user.data')->get('dhcr_backend', (int) $account->id(), 'legacy_approved') ?? 0) === 1 : FALSE;
+      $enabled = $account && $account->isActive() && (int) ($profile->get('enabled')->value ?? 0) === 1;
+      $status_route = !$approved ? 'dhcr_backend.account_approve' : ($enabled ? 'dhcr_backend.account_disable' : 'dhcr_backend.account_enable');
+      $status_label = !$approved ? (string) $this->t('Approve') : ($enabled ? (string) $this->t('Disable') : (string) $this->t('Enable'));
 
       $rows[] = [
         'id' => (string) $profile->id(),
         'view_url' => $user_view_url,
         'edit_url' => $user_edit_url,
+        'status_url' => $account && $this->currentUser()->hasPermission('approve_dhcr_country_users') ? Url::fromRoute($status_route, ['user' => (int) $account->id()])->toString() : '',
+        'status_label' => $status_label,
         'last_name' => (string) ($profile->get('last_name')->value ?? ''),
         'first_name' => (string) ($profile->get('first_name')->value ?? ''),
         'email' => (string) ($profile->get('email')->value ?? ''),
-        'enabled' => ((int) ($profile->get('enabled')->value ?? 0) === 1) ? 'Yes' : 'No',
-        'enabled_sort' => (int) ($profile->get('enabled')->value ?? 0),
+        'enabled' => $enabled ? 'Yes' : 'No',
+        'enabled_sort' => $enabled ? 1 : 0,
         'institution' => $institution ? (string) $institution->label() : '',
         'other_organisation' => (string) ($profile->get('other_organisation')->value ?? ''),
       ];
@@ -103,6 +117,9 @@ final class DhcrContributorController extends ControllerBase {
 
     foreach ($invitations as $invitation) {
       $institution = $invitation->get('institution')->entity;
+      if (!$this->currentUser()->hasPermission('administer_dhcr_global_settings') && (int) ($institution?->get('country')->target_id ?? 0) !== DhcrCountryScope::countryId($this->currentUser())) {
+        continue;
+      }
       $valid_until = (int) ($invitation->get('valid_until')->value ?? 0);
       $account = $invitation->get('user')->entity;
       $user_id = $account ? (int) $account->id() : 0;
@@ -183,6 +200,12 @@ final class DhcrContributorController extends ControllerBase {
   }
 
   public function userView(UserInterface $user): array {
+    if ($user->hasRole('administrator') && !$this->currentUser()->hasPermission('administer permissions')) {
+      throw new AccessDeniedHttpException('Only a Drupal administrator can view another Drupal administrator here.');
+    }
+    if (!$this->currentUser()->hasPermission('administer_dhcr_global_settings') && !DhcrCountryScope::matchesUser($this->currentUser(), $user)) {
+      throw new AccessDeniedHttpException('This user belongs to another country.');
+    }
     $profile = $this->loadProfile((int) $user->id());
     $legacy = $this->loadLegacyUserData($user);
     $institution = $profile?->get('institution')->entity;
@@ -248,6 +271,10 @@ final class DhcrContributorController extends ControllerBase {
         [
           'label' => (string) $this->t('Admin'),
           'value' => $this->yesNo($user->hasRole('administrator') || (int) $legacy['is_admin'] === 1),
+        ],
+        [
+          'label' => (string) $this->t('CR Administrator'),
+          'value' => $this->yesNo($user->hasRole('cr_admin')),
         ],
         [
           'label' => (string) $this->t('Show as admin on contact page'),

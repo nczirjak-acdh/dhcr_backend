@@ -12,4 +12,5 @@ dependencies:
   - drupal:options
   - drupal:link
   - drupal:views
+  - drupal:toolbar
   - dhcr_logs:dhcr_logs

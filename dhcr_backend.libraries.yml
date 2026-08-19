@@ -86,6 +86,12 @@ admin_user_edit:
   css:
     theme:
       css/dhcr_user_edit_admin.css: {}
+  js:
+    js/dhcr_user_edit.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/once
 
 admin_statistics:
   version: 1.x

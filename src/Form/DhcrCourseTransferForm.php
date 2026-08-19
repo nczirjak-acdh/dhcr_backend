@@ -43,7 +43,7 @@ final class DhcrCourseTransferForm extends FormBase {
       return $form;
     }
 
-    $is_global_admin = $this->currentUser->hasPermission('administer dhcr global settings');
+    $is_global_admin = $this->currentUser->hasPermission('administer_dhcr_global_settings');
     $moderated_country_id = $is_global_admin ? 0 : $this->resolveCurrentUserCountryId();
     $course_country_id = $this->resolveCourseCountryId($dhcr_course);
 
@@ -201,7 +201,7 @@ final class DhcrCourseTransferForm extends FormBase {
       return;
     }
 
-    $is_global_admin = $this->currentUser->hasPermission('administer dhcr global settings');
+    $is_global_admin = $this->currentUser->hasPermission('administer_dhcr_global_settings');
     if (!$is_global_admin) {
       $moderated_country_id = $this->resolveCurrentUserCountryId();
       $course_country_id = $this->resolveCourseCountryId($course);

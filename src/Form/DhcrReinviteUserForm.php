@@ -8,6 +8,8 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\dhcr_backend\Entity\UserInvitation;
+use Drupal\dhcr_backend\Service\DhcrMailManager;
+use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -25,9 +27,12 @@ final class DhcrReinviteUserForm extends FormBase {
 
   private EntityTypeManagerInterface $entityTypeManager;
 
+  private DhcrMailManager $dhcrMailManager;
+
   public static function create(ContainerInterface $container): self {
     $instance = new self();
     $instance->entityTypeManager = $container->get('entity_type.manager');
+    $instance->dhcrMailManager = $container->get('dhcr_backend.mail_manager');
     return $instance;
   }
 
@@ -130,9 +135,14 @@ final class DhcrReinviteUserForm extends FormBase {
     $invitation->set('valid_until', strtotime('+24 hours'));
     $invitation->save();
 
-    $this->messenger()->addStatus($this->t('Invitation renewed for %mail.', [
-      '%mail' => (string) $invitation->get('email')->value,
-    ]));
+    $account = $invitation->get('user')->entity;
+    $email = (string) $invitation->get('email')->value;
+    if ($account instanceof UserInterface && $this->dhcrMailManager->sendInvitation($invitation, $account)) {
+      $this->messenger()->addStatus($this->t('Invitation renewed and sent to %mail.', ['%mail' => $email]));
+    }
+    else {
+      $this->messenger()->addError($this->t('The invitation was renewed, but the email to %mail could not be sent. Check the DHCR logs.', ['%mail' => $email]));
+    }
 
     $form_state->setRedirect('dhcr_backend.pending_invitations');
   }

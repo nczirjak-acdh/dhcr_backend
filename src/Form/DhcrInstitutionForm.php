@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\dhcr_backend\Form;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\dhcr_backend\Access\DhcrCountryScope;
 use Drupal\dhcr_backend\Utility\DhcrMapConfig;
 
 final class DhcrInstitutionForm extends DhcrContentEntityForm {
@@ -45,6 +46,11 @@ final class DhcrInstitutionForm extends DhcrContentEntityForm {
       $form['country']['widget'][0]['target_id']['#type'] = 'select';
       $form['country']['widget'][0]['target_id']['#title'] = $this->t('Country');
       $form['country']['widget'][0]['target_id']['#empty_option'] = $this->t('- Select country -');
+      if (!$this->currentUser()->hasPermission('administer_dhcr_global_settings')) {
+        $country_id = DhcrCountryScope::countryId($this->currentUser());
+        $form['country']['widget'][0]['target_id']['#default_value'] = $country_id;
+        $form['country']['widget'][0]['target_id']['#disabled'] = TRUE;
+      }
     }
 
     if (isset($form['description']['widget'][0]['value'])) {

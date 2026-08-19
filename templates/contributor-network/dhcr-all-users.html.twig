@@ -22,6 +22,9 @@
           <td class="actions">
             <a href="{{ row.view_url }}">{{ 'View'|t }}</a>
             <a href="{{ row.edit_url }}">{{ 'Edit'|t }}</a>
+            {% if row.status_url %}
+              <a href="{{ row.status_url }}">{{ row.status_label }}</a>
+            {% endif %}
           </td>
           <td>{{ row.last_name }}</td>
           <td>{{ row.first_name }}</td>

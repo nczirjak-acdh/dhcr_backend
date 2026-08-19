@@ -1,0 +1,29 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - dhcr_backend
+    - system
+    - user
+id: moderator
+label: 'National Moderator'
+weight: 3
+is_admin: false
+permissions:
+  - 'access content'
+  - 'access user profiles'
+  - access_dhcr_contributor
+  - administer_dhcr_backend
+  - approve_dhcr_country_courses
+  - approve_dhcr_country_users
+  - create_dhcr_courses
+  - edit_own_dhcr_courses
+  - invite_dhcr_users
+  - manage_dhcr_country_master_data
+  - moderate_dhcr_country_courses
+  - moderate_dhcr_country_users
+  - unpublish_own_dhcr_courses
+  - view_dhcr_contributor_faq
+  - view_dhcr_moderator_faq
+  - view_dhcr_workflows
+  - view_own_dhcr_courses

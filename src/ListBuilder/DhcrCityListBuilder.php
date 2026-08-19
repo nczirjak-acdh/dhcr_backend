@@ -21,6 +21,9 @@ final class DhcrCityListBuilder extends EntityListBuilder {
   public function render(): array {
     $rows = [];
     foreach ($this->load() as $entity) {
+      if (!$entity->access('update')) {
+        continue;
+      }
       $rows[] = $this->buildRow($entity);
     }
     $rows = $this->sortRows($rows, [
@@ -43,6 +46,7 @@ final class DhcrCityListBuilder extends EntityListBuilder {
         'library' => ['dhcr_backend/admin_city'],
       ],
       '#cache' => [
+        'contexts' => ['user', 'user.permissions'],
         'tags' => $this->entityType->getListCacheTags(),
       ],
     ];

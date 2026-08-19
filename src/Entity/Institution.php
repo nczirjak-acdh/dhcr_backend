@@ -24,10 +24,10 @@ use Drupal\dhcr_backend\Entity\Traits\DhcrLabelTrait;
  *     "route_provider" = {
  *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider"
  *     },
- *     "access" = "Drupal\dhcr_backend\Access\DhcrGenericAccessControlHandler"
+ *     "access" = "Drupal\dhcr_backend\Access\DhcrCountryMasterDataAccessControlHandler"
  *   },
  *   base_table = "dhcr_institution",
- *   admin_permission = "administer dhcr backend",
+ *   admin_permission = "manage_dhcr_country_master_data",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "name",

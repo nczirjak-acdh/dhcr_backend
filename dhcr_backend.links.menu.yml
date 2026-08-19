@@ -160,3 +160,10 @@ dhcr_backend.statistics_app_info:
   route_name: dhcr_backend.statistics_app_info
   parent: dhcr_backend.statistics
   weight: 4
+
+dhcr_backend.email_templates:
+  title: 'Email templates'
+  description: 'Edit DHCR email subjects, messages, and delivery defaults'
+  route_name: dhcr_backend.email_templates
+  parent: dhcr_backend.admin
+  weight: 10

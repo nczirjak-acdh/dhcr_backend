@@ -75,6 +75,16 @@
   color: #d14343;
 }
 
+.dhcr-user-edit-form__moderated-country {
+  color: #636970;
+  margin: -8px 0 18px;
+}
+
+.dhcr-user-edit-form__moderated-country-label {
+  color: #1f73b5;
+  font-weight: 700;
+}
+
 .dhcr-user-edit-form__national-moderator {
   margin: 30px 0 18px;
 }

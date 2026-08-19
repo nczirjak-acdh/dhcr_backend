@@ -7,10 +7,13 @@ namespace Drupal\dhcr_backend\Form;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
+use Drupal\dhcr_backend\Service\DhcrMailManager;
 use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 final class DhcrInviteUserForm extends DhcrContentEntityForm {
+
+  private DhcrMailManager $dhcrMailManager;
 
   private const LOCALIZATION_NAMES = [
     'English',
@@ -29,7 +32,9 @@ final class DhcrInviteUserForm extends DhcrContentEntityForm {
   }
 
   public static function create(ContainerInterface $container): static {
-    return parent::create($container);
+    $instance = parent::create($container);
+    $instance->dhcrMailManager = $container->get('dhcr_backend.mail_manager');
+    return $instance;
   }
 
   public function form(array $form, FormStateInterface $form_state): array {
@@ -124,6 +129,12 @@ final class DhcrInviteUserForm extends DhcrContentEntityForm {
     }
 
     $this->ensureInviteUserElements($form);
+    $form['initial_password'] = [
+      '#type' => 'password_confirm',
+      '#title' => $this->t('Initial password'),
+      '#required' => FALSE,
+      '#description' => $this->t('Optional. Leave empty to let the user choose a password using the link in the invitation email.'),
+    ];
     $this->groupInviteUserFields($form);
 
     return $form;
@@ -136,21 +147,57 @@ final class DhcrInviteUserForm extends DhcrContentEntityForm {
     $last_name = trim((string) $entity->get('last_name')->value);
     $email = trim((string) $entity->get('email')->value);
     $full_name = trim($first_name . ' ' . $last_name);
+    $password_value = $form_state->getValue('initial_password', '');
+    // Drupal 11 converts a validated password_confirm value from the original
+    // pass1/pass2 array into a single password string.
+    $initial_password = is_array($password_value)
+      ? (string) ($password_value['pass1'] ?? '')
+      : (string) $password_value;
 
     $entity->set('name', $full_name !== '' ? $full_name : $email);
     $entity->set('valid_until', strtotime('+24 hours'));
     $entity->set('account_enabled', 1);
 
     $account = user_load_by_mail($email);
+    $is_new_account = !$account;
     if (!$account) {
       $username = $full_name !== '' ? $full_name : $email;
       $account = User::create([
         'name' => $username,
         'mail' => $email,
         'status' => 1,
-        'pass' => bin2hex(random_bytes(16)),
+        // Drupal requires a stored password even when the invited user will
+        // choose their real password through the one-time login link.
+        'pass' => $initial_password !== '' ? $initial_password : bin2hex(random_bytes(32)),
       ]);
+      $account->addRole('contributor');
       $account->save();
+    }
+    else {
+      $account_changed = FALSE;
+      if (!$account->hasRole('contributor') && !$account->hasRole('moderator') && !$account->hasRole('cr_admin') && !$account->hasRole('administrator')) {
+        $account->addRole('contributor');
+        $account_changed = TRUE;
+      }
+      if ($initial_password !== '') {
+        $account->setPassword($initial_password);
+        $account_changed = TRUE;
+      }
+      if ($account_changed) {
+        $account->save();
+      }
+    }
+
+    $user_data = \Drupal::service('user.data');
+    // An administrator entered the address directly, so no separate address
+    // verification step is required.
+    $user_data->set('dhcr_backend', (int) $account->id(), 'legacy_email_verified', 1);
+    if ($is_new_account) {
+      $user_data->set('dhcr_backend', (int) $account->id(), 'legacy_password_set', $initial_password !== '' ? 1 : 0);
+      $user_data->set('dhcr_backend', (int) $account->id(), 'legacy_approved', 0);
+    }
+    elseif ($initial_password !== '') {
+      $user_data->set('dhcr_backend', (int) $account->id(), 'legacy_password_set', 1);
     }
 
     $entity->set('user', $account->id());
@@ -185,7 +232,12 @@ final class DhcrInviteUserForm extends DhcrContentEntityForm {
     }
     $profile->save();
 
-    $this->messenger()->addStatus($this->t('Invitation prepared for %mail.', ['%mail' => $email]));
+    if ($this->dhcrMailManager->sendInvitation($entity, $account)) {
+      $this->messenger()->addStatus($this->t('Invitation sent to %mail.', ['%mail' => $email]));
+    }
+    else {
+      $this->messenger()->addError($this->t('The invitation was saved, but the email to %mail could not be sent. Check the DHCR logs.', ['%mail' => $email]));
+    }
     $form_state->setRedirect('dhcr_backend.pending_invitations');
 
     return $status;
@@ -341,6 +393,7 @@ final class DhcrInviteUserForm extends DhcrContentEntityForm {
       'first_name' => -18,
       'last_name' => -17,
       'email' => -16,
+      'initial_password' => -15,
       'dhcr_step_3' => -10,
       'localization' => -9,
     ];

@@ -1,0 +1,148 @@
+subject_prefix: '[DH Course Registry] '
+sender: ''
+reply_to: ''
+default_cc: ''
+footer: |-
+  --
+
+  The Digital Humanities Course Registry:
+  {{ site_url }}
+templates:
+  welcome:
+    enabled: true
+    subject: 'Welcome! Your account is ready to log in.'
+    body: |-
+      Dear {{ first_name }} {{ last_name }},
+
+      your DHCR account has been enabled!
+
+      Follow this link to log in:
+      {{ login_url }}
+  email_confirmation:
+    enabled: true
+    subject: 'Confirm your email address'
+    body: |-
+      To verify your email address, click the link below.
+
+      {{ confirmation_url }}
+  password_reset:
+    enabled: true
+    subject: 'Reset password'
+    body: |-
+      To change your password, click the link below.
+      If you did not request the password reset, you can ignore this email.
+
+      {{ password_reset_url }}
+
+      This link is valid until {{ expires_at }}.
+  account_approval_request:
+    enabled: true
+    subject: 'New Account Request'
+    body: |-
+      Hello Admin,
+
+      a new user has registered at the DHCR and is waiting for approval of the new account!
+      In first place, you should now check the user's eligibility.
+
+      {{ missing_institution_notice }}
+
+      User Overview
+      Name: {{ user_name }}
+      Email: {{ user_email }}
+      About: {{ about }}
+      Affiliation: {{ institution }}
+
+      Click here to start the approval process
+      (valid 7 days until {{ approval_expires_on }}):
+      {{ approval_url }}
+  course_approval_request:
+    enabled: true
+    subject: 'New Course waiting for approval'
+    body: |-
+      Hello Admin,
+
+      A new course has been entered in the DHCR and is waiting for approval!
+
+      Course Overview
+      - Course Name: {{ course_name }}
+
+      - Education Type: {{ course_type }}
+
+      - Institution: {{ institution }}
+
+      Click here to go to "Course Approval", check the details and approve the course:
+      {{ approval_url }}
+  course_reminder:
+    enabled: true
+    subject: 'Expired {{ course_word }}'
+    body: |-
+      Dear {{ recipient_name }},
+
+      The following {{ course_word }} in the Digital Humanities Course Registry {{ has_or_have }}
+      not been updated for a long while.
+
+      To prevent the registry from showing outdated information, please review the {{ course_word }} below. Please note, that you
+      must click "Update Course", even if the information did not change. This will update the 'last-modification-date' of your course.
+
+      If the course does not take place anymore, please unpublish it (Go to your Dashboard -> My Courses -> Edit -> Uncheck publish).
+
+      If the course is still running but you wish to transfer the course ownership to a fellow lecturer, please let us know by replying
+      to this email with the details of the lecturer.
+
+      {{ course_list }}
+
+      Thank you for your effort,
+  review_reminder:
+    enabled: true
+    subject: 'DHCR - Your Attention Needed on {{ issue_count }} GitHub Issue{{ issue_suffix }}'
+    body: |-
+      Dear {{ first_name }},
+
+      I hope this message finds you well. We want to bring to your attention the
+      importance of reviewing and addressing GitHub issues that have been raised.
+      These issues are crucial to the progress of the project, and your input is
+      invaluable in ensuring a smooth and efficient development process.
+
+      There are currently a total of {{ issue_count }} issue{{ issue_suffix }} waiting for your review.
+
+      GitHub issues serve as a centralized platform for identifying, discussing, and
+      resolving tasks, bugs, and feature requests. Your expertise is needed to review
+      these items promptly, as it directly impacts the overall success of the project.
+      Here are a few reasons why your timely attention is crucial:
+
+      1. Efficient Problem Resolution: Your insights and expertise are vital in identifying
+      potential issues, clarifying requirements, and proposing effective solutions. By
+      reviewing and responding promptly, we can address problems before they escalate and
+      contribute to a more streamlined development process.
+
+      2. Collaborative Decision-Making: GitHub issues foster collaboration and provide a space
+      for team members to share thoughts, ask questions, and make informed decisions collectively.
+      Your input plays a significant role in shaping the direction of our projects and ensuring
+      that everyone is on the same page.
+
+      3. Project Momentum: Timely reviews and resolutions help maintain project momentum. Delays
+      in addressing issues can hinder progress, impact deadlines, and potentially lead to a
+      less-than-optimal end product. Your active participation is crucial to keeping the development
+      process moving forward smoothly.
+
+      To assist you in navigating GitHub issues, we have included the following link:
+      {{ issues_url }}
+
+      Your prompt attention to GitHub issues is highly appreciated and will contribute
+      significantly to the success of the DHCR project. Thank you for your dedication
+      and collaboration.
+
+      *Saying of the week*
+      {{ oneliner }}
+
+      Note:
+      Please don't reply to this email, since it's sent as part of an automated process which
+      notifies you weekly when GitHub issues are waiting for your review.
+
+      Best regards,
+
+      Your DHCR Developer
+  test:
+    enabled: true
+    subject: 'Test Mail'
+    body: 'My message'

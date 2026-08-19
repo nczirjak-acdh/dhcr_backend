@@ -27,7 +27,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "access" = "Drupal\dhcr_backend\Access\DhcrGenericAccessControlHandler"
  *   },
  *   base_table = "dhcr_invite_translation",
- *   admin_permission = "administer dhcr global settings",
+ *   admin_permission = "administer_dhcr_global_settings",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "subject",

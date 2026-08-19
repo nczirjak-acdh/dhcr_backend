@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - dhcr_backend
+    - system
+    - user
+id: contributor
+label: 'Course contributor'
+weight: 2
+is_admin: false
+permissions:
+  - 'access content'
+  - 'access user profiles'
+  - access_dhcr_contributor
+  - create_dhcr_courses
+  - edit_own_dhcr_courses
+  - unpublish_own_dhcr_courses
+  - view_dhcr_contributor_faq
+  - view_own_dhcr_courses

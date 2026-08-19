@@ -6,54 +6,69 @@ namespace Drupal\dhcr_backend\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
+use Drupal\dhcr_backend\Access\DhcrCountryScope;
 use Drupal\dhcr_backend\Entity\Course;
+use Drupal\dhcr_backend\Service\DhcrMailManager;
 use Drupal\dhcr_backend\Utility\DhcrMapConfig;
 use Drupal\dhcr_backend\Utility\DhcrCourseStatusConfig;
 use Drupal\user\UserInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 final class DhcrDashboardController extends ControllerBase {
 
+  public function __construct(
+    private readonly DhcrMailManager $dhcrMailManager,
+  ) {}
+
+  public static function create(ContainerInterface $container): static {
+    return new static($container->get('dhcr_backend.mail_manager'));
+  }
+
   public function dashboard(): array {
     $current_user = $this->currentUser();
     $display_name = $current_user->getDisplayName();
-    $is_global_admin = $current_user->hasPermission('administer dhcr global settings');
-    $is_moderator_backend = $current_user->hasPermission('administer dhcr backend');
+    $is_global_admin = $current_user->hasPermission('administer_dhcr_global_settings');
+    $is_moderator_backend = $current_user->hasPermission('administer_dhcr_backend');
     $role_text = $is_global_admin
-      ? (string) $this->t('administrator')
+      ? ($current_user->hasRole('cr_admin') ? (string) $this->t('CR administrator') : (string) $this->t('administrator'))
       : ($is_moderator_backend ? (string) $this->t('national moderator') : (string) $this->t('contributor'));
 
     $pending_approval = $this->countPendingCourses();
     $expiry_candidates = $this->countCourseExpiryCandidates();
 
-    $cards = [
-      [
+    $cards = [];
+    if ($current_user->hasPermission('administer_dhcr_backend')) {
+      $cards[] = [
         'title' => (string) $this->t('Needs Attention'),
         'icon' => 'fas fa-flag',
         'url' => $this->routeOrFallback('dhcr_backend.needs_attention'),
-      ],
-      [
+      ];
+    }
+    $cards[] = [
         'title' => (string) $this->t('Administrate Courses'),
         'icon' => 'fas fa-graduation-cap',
         'url' => $this->routeOrFallback('dhcr_backend.courses_admin'),
-      ],
-      [
+      ];
+    if ($current_user->hasPermission('moderate_dhcr_country_users')) {
+      $cards[] = [
         'title' => (string) $this->t('Contributor Network'),
         'icon' => 'fas fa-user',
         'url' => $this->routeOrFallback('dhcr_backend.contributor_network'),
-      ],
-      [
+      ];
+    }
+    $cards[] = [
         'title' => (string) $this->t('Profile Settings'),
         'icon' => 'fas fa-cog',
         'url' => $this->routeOrFallback('entity.user.edit_form', ['user' => $current_user->id()]),
-      ],
-      [
+      ];
+    $cards[] = [
         'title' => (string) $this->t('Help'),
         'icon' => 'fas fa-question-circle',
         'url' => $this->routeOrFallback('dhcr_backend.help'),
-      ],
-    ];
+      ];
 
     if ($is_global_admin) {
       $cards[] = [
@@ -89,7 +104,7 @@ final class DhcrDashboardController extends ControllerBase {
 
   public function coursesAdmin(): array {
     $current_user = $this->currentUser();
-    $is_global_admin = $current_user->hasPermission('administer dhcr global settings');
+    $is_global_admin = $current_user->hasPermission('administer_dhcr_global_settings');
     $all_courses = $this->countAdminVisibleCourses();
     $my_courses = $this->countAdminVisibleCourses((int) $current_user->id());
     $external_resources = $this->countEntities('dhcr_external_resource');
@@ -102,18 +117,21 @@ final class DhcrDashboardController extends ControllerBase {
         'url' => $this->routeOrFallback('entity.dhcr_course.add_form'),
       ],
       [
-        'title' => (string) $this->t('All Courses'),
-        'icon' => 'fas fa-list-alt',
-        'count' => $all_courses,
-        'url' => $this->routeOrFallback('dhcr_backend.courses_admin_all_courses'),
-      ],
-      [
         'title' => (string) $this->t('My Courses'),
         'icon' => 'fas fa-graduation-cap',
         'count' => $my_courses,
         'url' => $this->routeOrFallback('dhcr_backend.courses_admin_my_courses'),
       ],
     ];
+
+    if ($current_user->hasPermission('moderate_dhcr_country_courses')) {
+      array_splice($cards, 1, 0, [[
+        'title' => (string) $this->t('All Courses'),
+        'icon' => 'fas fa-list-alt',
+        'count' => $all_courses,
+        'url' => $this->routeOrFallback('dhcr_backend.courses_admin_all_courses'),
+      ]]);
+    }
 
     if ($is_global_admin) {
       $cards[] = [
@@ -243,7 +261,7 @@ final class DhcrDashboardController extends ControllerBase {
       ],
     ];
 
-    if ($this->currentUser()->hasPermission('administer dhcr global settings')) {
+    if ($this->currentUser()->hasPermission('administer_dhcr_global_settings')) {
       array_unshift($cards, [
         'title' => (string) $this->t('Contributor FAQ'),
         'icon' => 'fas fa-graduation-cap',
@@ -358,6 +376,9 @@ final class DhcrDashboardController extends ControllerBase {
           continue;
         }
         $profile = $this->loadContributorProfile((int) $account->id());
+        if (!$this->currentUser()->hasPermission('administer_dhcr_global_settings') && !DhcrCountryScope::matchesUser($this->currentUser(), $account)) {
+          continue;
+        }
         $institution = $profile?->get('institution')->entity;
         $created = (int) ($profile?->get('created')->value ?? $account->getCreatedTime());
         $display_name = (string) $account->getDisplayName();
@@ -392,12 +413,16 @@ final class DhcrDashboardController extends ControllerBase {
   }
 
   public function approveAccount(UserInterface $user): RedirectResponse {
+    $this->assertUserInScope($user);
     if ((int) $user->id() <= 1) {
       $this->messenger()->addError($this->t('This account cannot be approved here.'));
       return $this->redirect('dhcr_backend.account_approval');
     }
 
     $user->activate();
+    if (!$user->hasRole('contributor') && !$user->hasRole('moderator') && !$user->hasRole('cr_admin') && !$user->hasRole('administrator')) {
+      $user->addRole('contributor');
+    }
     $user->save();
 
     $profile = $this->loadContributorProfile((int) $user->id());
@@ -407,11 +432,55 @@ final class DhcrDashboardController extends ControllerBase {
     }
 
     \Drupal::service('user.data')->set('dhcr_backend', (int) $user->id(), 'legacy_approved', 1);
+    $tokens = $this->dhcrMailManager->userNameTokens($user) + [
+      'login_url' => Url::fromRoute('user.login', [], ['absolute' => TRUE])->toString(),
+    ];
+    if (!$this->dhcrMailManager->sendTemplate('welcome', $user->getEmail(), $tokens, [
+      'related_user' => (int) $user->id(),
+    ])) {
+      $this->messenger()->addWarning($this->t('The account was approved, but the welcome email could not be sent.'));
+    }
     $this->messenger()->addStatus($this->t('Approved account for %name.', [
       '%name' => $user->getDisplayName(),
     ]));
 
     return $this->redirect('dhcr_backend.account_approval');
+  }
+
+  public function disableAccount(UserInterface $user): RedirectResponse {
+    $this->assertUserInScope($user);
+    if ((int) $user->id() <= 1) {
+      $this->messenger()->addError($this->t('This account cannot be disabled here.'));
+      return $this->redirect('dhcr_backend.all_users');
+    }
+
+    $user->block();
+    $user->save();
+    $profile = $this->loadContributorProfile((int) $user->id());
+    if ($profile) {
+      $profile->set('enabled', 0);
+      $profile->save();
+    }
+    $this->messenger()->addStatus($this->t('Disabled account for %name.', ['%name' => $user->getDisplayName()]));
+    return $this->redirect('dhcr_backend.all_users');
+  }
+
+  public function enableAccount(UserInterface $user): RedirectResponse {
+    $this->assertUserInScope($user);
+    if ((int) $user->id() <= 1) {
+      $this->messenger()->addError($this->t('This account cannot be enabled here.'));
+      return $this->redirect('dhcr_backend.all_users');
+    }
+
+    $user->activate();
+    $user->save();
+    $profile = $this->loadContributorProfile((int) $user->id());
+    if ($profile) {
+      $profile->set('enabled', 1);
+      $profile->save();
+    }
+    $this->messenger()->addStatus($this->t('Enabled account for %name.', ['%name' => $user->getDisplayName()]));
+    return $this->redirect('dhcr_backend.all_users');
   }
 
   public function courseApproval(): array {
@@ -433,6 +502,9 @@ final class DhcrDashboardController extends ControllerBase {
   }
 
   public function approveCourse(Course $dhcr_course): RedirectResponse {
+    if (!$this->currentUser()->hasPermission('administer_dhcr_global_settings') && !DhcrCountryScope::matchesEntity($this->currentUser(), $dhcr_course)) {
+      throw new AccessDeniedHttpException('This course belongs to another country.');
+    }
     $dhcr_course->set('approved', 1);
     $dhcr_course->save();
 
@@ -473,6 +545,7 @@ final class DhcrDashboardController extends ControllerBase {
       foreach ($conditions as $field => $value) {
         $query->condition($field, $value);
       }
+      $this->applyCourseCountryScope($query);
       return (int) $query->count()->execute();
     }
     catch (\Throwable) {
@@ -541,6 +614,9 @@ final class DhcrDashboardController extends ControllerBase {
       if ($owner_id !== NULL) {
         $query->condition('uid', $owner_id);
       }
+      elseif (!$this->currentUser()->hasPermission('administer_dhcr_global_settings')) {
+        $this->applyCourseCountryScope($query);
+      }
 
       return (int) $query->count()->execute();
     }
@@ -551,16 +627,16 @@ final class DhcrDashboardController extends ControllerBase {
 
   private function countCourseExpiryCandidates(): int {
     try {
-      return (int) $this->entityTypeManager()
+      $query = $this->entityTypeManager()
         ->getStorage('dhcr_course')
         ->getQuery()
         ->accessCheck(FALSE)
         ->condition('active', 1)
         ->condition('archived', 0)
         ->condition('changed', DhcrCourseStatusConfig::archiveDate(), '>')
-        ->condition('changed', DhcrCourseStatusConfig::yellowDate(), '<')
-        ->count()
-        ->execute();
+        ->condition('changed', DhcrCourseStatusConfig::yellowDate(), '<');
+      $this->applyCourseCountryScope($query);
+      return (int) $query->count()->execute();
     }
     catch (\Throwable) {
       return 0;
@@ -574,6 +650,7 @@ final class DhcrDashboardController extends ControllerBase {
       foreach ($conditions as $field => $value) {
         $query->condition($field, $value);
       }
+      $this->applyCourseCountryScope($query);
       $ids = $query->execute();
       return $ids ? $storage->loadMultiple($ids) : [];
     }
@@ -593,6 +670,9 @@ final class DhcrDashboardController extends ControllerBase {
       if ($owner_id !== NULL) {
         $query->condition('uid', $owner_id);
       }
+      elseif (!$this->currentUser()->hasPermission('administer_dhcr_global_settings')) {
+        $this->applyCourseCountryScope($query);
+      }
 
       $ids = $query->execute();
       return $ids ? $storage->loadMultiple($ids) : [];
@@ -605,13 +685,14 @@ final class DhcrDashboardController extends ControllerBase {
   private function loadCourseExpiryCandidates(): array {
     try {
       $storage = $this->entityTypeManager()->getStorage('dhcr_course');
-      $ids = $storage->getQuery()
+      $query = $storage->getQuery()
         ->accessCheck(FALSE)
         ->condition('active', 1)
         ->condition('archived', 0)
         ->condition('changed', DhcrCourseStatusConfig::archiveDate(), '>')
-        ->condition('changed', DhcrCourseStatusConfig::yellowDate(), '<')
-        ->execute();
+        ->condition('changed', DhcrCourseStatusConfig::yellowDate(), '<');
+      $this->applyCourseCountryScope($query);
+      $ids = $query->execute();
 
       return $ids ? $storage->loadMultiple($ids) : [];
     }
@@ -623,13 +704,14 @@ final class DhcrDashboardController extends ControllerBase {
   private function loadExpiredCourses(): array {
     try {
       $storage = $this->entityTypeManager()->getStorage('dhcr_course');
-      $ids = $storage->getQuery()
+      $query = $storage->getQuery()
         ->accessCheck(FALSE)
         ->condition('active', 1)
         ->condition('archived', 0)
         ->condition('changed', DhcrCourseStatusConfig::archiveDate(), '>')
-        ->condition('changed', DhcrCourseStatusConfig::yellowDate(), '<')
-        ->execute();
+        ->condition('changed', DhcrCourseStatusConfig::yellowDate(), '<');
+      $this->applyCourseCountryScope($query);
+      $ids = $query->execute();
 
       return $ids ? $storage->loadMultiple($ids) : [];
     }
@@ -645,6 +727,24 @@ final class DhcrDashboardController extends ControllerBase {
     catch (RouteNotFoundException) {
       return Url::fromRoute('system.admin_content')->toString();
     }
+  }
+
+  private function assertUserInScope(UserInterface $user): void {
+    if ($user->hasRole('administrator') && !$this->currentUser()->hasPermission('administer users')) {
+      throw new AccessDeniedHttpException('Only a Drupal administrator can change another Drupal administrator.');
+    }
+    if (!$this->currentUser()->hasPermission('administer_dhcr_global_settings') && !DhcrCountryScope::matchesUser($this->currentUser(), $user)) {
+      throw new AccessDeniedHttpException('This user belongs to another country.');
+    }
+  }
+
+  private function applyCourseCountryScope($query): void {
+    if ($this->currentUser()->hasPermission('administer_dhcr_global_settings')) {
+      return;
+    }
+    $country_id = DhcrCountryScope::countryId($this->currentUser());
+    // A moderator without an assigned country must not see global records.
+    $query->condition('country', $country_id > 0 ? $country_id : -1);
   }
 
 }
