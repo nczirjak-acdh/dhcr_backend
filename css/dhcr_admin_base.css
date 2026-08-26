@@ -30,9 +30,6 @@
   font-size: 0.8rem;
 }
 
-form.dhcr-backend-form,
-form[class^="dhcr-backend-"],
-form[class*=" dhcr-backend-"],
 .dhcr-dashboard,
 .dhcr-category-lists,
 .dhcr-courses-admin,
@@ -54,6 +51,15 @@ form[class*=" dhcr-backend-"],
 .dhcr-external-resources-list,
 .dhcr-users-view,
 .dhcr-user-details {
+     box-sizing: border-box;
+  margin: 24px;
+  padding: 24px;
+}
+
+form.dhcr-backend-form,
+form[class^="dhcr-backend-"],
+form[class*=" dhcr-backend-"]
+ {
   border: 2px solid #b3b8be;
   box-sizing: border-box;
   margin: 24px;
